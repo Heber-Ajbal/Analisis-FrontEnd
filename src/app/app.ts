@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
-import { UserbarComponent } from './userbar.component'; // 👈 importa tu userbar
+import { UserbarComponent } from './shared/components/userbar/userbar.component'; 
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { UserbarComponent } from './userbar.component'; // 👈 importa tu userb
   imports: [
     RouterOutlet,
     RouterLink,
-    UserbarComponent  // 👈 agréga aquí tu componente
+    UserbarComponent 
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
