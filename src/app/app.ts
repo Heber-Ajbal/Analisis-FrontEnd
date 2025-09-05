@@ -7,8 +7,6 @@ import { UserbarComponent } from './shared/components/userbar/userbar.component'
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterLink,
-    UserbarComponent 
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

@@ -1,0 +1,17 @@
+.bg {
+  background: linear-gradient(135deg, var(--mat-sys-surface) 0%, var(--mat-sys-surface-container-high) 100%);
+}
+
+.card {
+  width: 100%;
+  max-width: 50rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 1.5rem;
+  @media (min-width: 768px) { padding: 2rem; }
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+}
+
+.text-muted { color: var(--mat-sys-on-surface-variant); }
+.link { color: var(--mat-sys-primary); }

@@ -1,0 +1,71 @@
+<mat-sidenav-container class="shell">
+
+  <mat-sidenav
+    mode="side"
+    opened
+    class="sidenav"
+    [style.width.px]="collapsed ? 72 : 240">
+
+    <div class="menu" [class.collapsed]="collapsed">
+
+      <div class="collapse-row" [class.collapsed]="collapsed">
+            <button
+                mat-icon-button
+                class="collapse-btn"
+                (click)="toggle()"
+                [attr.aria-expanded]="!collapsed"
+                [matTooltip]="collapsed ? 'Expandir menú' : 'Contraer menú'">
+                <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+            </button>
+            <span class="collapse-text" [class.hide]="collapsed">APP</span>
+        </div>
+
+
+      <a class="menu-item" matRipple routerLink="/home" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Inicio' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">home</mat-icon>
+        <span class="label">Inicio</span>
+      </a>
+
+      <a class="menu-item" matRipple routerLink="/revision" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Buscar' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">search</mat-icon>
+        <span class="label">Buscar</span>
+      </a>
+
+      <a class="menu-item" matRipple routerLink="/admin" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Alertas' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">notifications</mat-icon>
+        <span class="label">Alertas</span>
+      </a>
+
+      <div class="divider"></div>
+
+      <a class="menu-item" matRipple routerLink="/login" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Login' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">login</mat-icon>
+        <span class="label">Login</span>
+      </a>
+
+      <a class="menu-item" matRipple routerLink="/registro" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Registro' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">person_add</mat-icon>
+        <span class="label">Registro</span>
+      </a>
+
+      <div class="spacer"></div>
+
+
+      <a class="menu-item" matRipple routerLink="/perfil" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Perfil' : ''" matTooltipPosition="right">
+        <mat-icon class="mi">person</mat-icon>
+        <span class="label">Perfil</span>
+      </a>
+    </div>
+  </mat-sidenav>
+
+
+  <mat-sidenav-content class="content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

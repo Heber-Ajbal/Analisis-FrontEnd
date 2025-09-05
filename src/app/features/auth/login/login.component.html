@@ -1,0 +1,60 @@
+<div class="min-h-screen grid place-items-center p-6 bg">
+  <div class="card">
+    <h1 class="text-2xl font-bold mb-8 text-center">Inicio de sesión</h1>
+    
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-3">
+      <mat-form-field appearance="fill">
+        <mat-label>Correo</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="nombre@correo.com" />
+        <mat-error *ngIf="form.get('email')?.hasError('required')">El correo es obligatorio</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">Formato de correo inválido</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Contraseña</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="pass" placeholder="••••••" />  
+        <mat-error *ngIf="form.get('pass')?.hasError('required')">La contraseña es obligatoria</mat-error>
+      </mat-form-field>
+      <p class="mb-6 text-muted text-right"> <a class="link">¿Olvidaste tu contraseña?</a></p>
+
+      <button mat-flat-button color="primary" class="mt-1" [disabled]="form.invalid || loading">
+        <mat-icon>login</mat-icon>&nbsp; Iniciar Sesion
+      </button>
+
+      <div class="my-6">
+        <div class="flex items-center gap-3 text-muted">
+            <div class="flex-1 h-px bg-[color:var(--mat-sys-outline-variant)] opacity-60"></div>
+            <span class="text-xs uppercase tracking-wider">o inicia sesión con</span>
+            <div class="flex-1 h-px bg-[color:var(--mat-sys-outline-variant)] opacity-60"></div>
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+        <button type="button" class="h-10 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition flex items-center justify-center"
+                 [disabled]="loading" aria-label="Iniciar sesión con Google">
+            <iconify-icon icon="logos:google-icon" width="20"></iconify-icon>
+            <span class="sr-only">Google</span>
+        </button>
+
+        <button type="button" class="h-10 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition flex items-center justify-center"
+                 [disabled]="loading" aria-label="Iniciar sesión con Facebook">
+            <iconify-icon icon="logos:facebook" width="20"></iconify-icon>
+            <span class="sr-only">Facebook</span>
+        </button>
+
+        <button type="button" class="h-10 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition flex items-center justify-center"
+                 [disabled]="loading" aria-label="Iniciar sesión con GitHub">
+            <iconify-icon icon="mdi:github" width="20"></iconify-icon>
+            <span class="sr-only">GitHub</span>
+        </button>
+        </div>
+
+        <p class="mt-4 text-muted text-center"> ¿No tienes una cuenta? <a routerLink="/registro" class="link">Registrate</a>
+    </p>
+      </div>      
+    </form>
+
+    <div class="mt-4 flex items-center gap-2" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+      <span class="text-muted">Validando…</span>
+    </div>
+  </div>
+</div>

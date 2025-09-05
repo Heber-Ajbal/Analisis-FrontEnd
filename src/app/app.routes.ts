@@ -12,13 +12,22 @@ import { authGuard }   from './core/guards/auth.guard';
 import { adminGuard }  from './core/guards/admin.guard';
 import { reviewGuard } from './core/guards/review.guard';
 
+// Layout
+import { AppLayoutComponent } from './layout/app-layout.component';
+
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: '',
+    component: AppLayoutComponent,   
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  { path: 'login',    component: LoginComponent },
-  { path: 'registro', component: RegisterComponent },
+      { path: 'login',    component: LoginComponent },
+      { path: 'registro', component: RegisterComponent },
 
-  { path: 'revision', component: ReviewComponent, canActivate: [reviewGuard] },
-  { path: 'home',     component: HomeComponent,   canActivate: [authGuard] },
-  { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
+      { path: 'revision', component: ReviewComponent, canActivate: [reviewGuard] },
+      { path: 'home',     component: HomeComponent,   canActivate: [authGuard]  },
+      { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
+    ]
+  }
 ];
