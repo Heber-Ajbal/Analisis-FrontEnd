@@ -1,75 +1,17 @@
+.shell   { height: 100dvh; background:#fff; }
+.sidenav { border-right: 1px solid rgba(0,0,0,.08); background:#fff; }
+.content { height: 100dvh; display:flex; flex-direction:column; }
+.page    { flex:1 1 auto; overflow:auto; padding: 16px; }
 
-.shell { height: 100vh; }
-.sidenav { width: 240px; } 
-.menu {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 12px 10px;
-  gap: 12px;            
-}
-
-
-
-.collapse-btn {
-  align-self: flex-start;
-  width: 36px;
-  height: 36px;
-}
-
-.menu.collapsed .collapse-btn {
-  align-self: center;
-}
-
+.menu { display:flex; flex-direction:column; height:100%; padding:.5rem; gap:.25rem; }
+.menu.collapsed .label { display:none; }
+.collapse-row { display:flex; align-items:center; gap:.5rem; padding:.25rem .5rem .75rem; }
+.collapse-row .collapse-text.hide { display:none; }
 
 .menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: background .15s ease;
+  display:flex; align-items:center; gap:.75rem;
+  padding:.625rem .75rem; border-radius:.75rem; color:#111827; text-decoration:none;
 }
-
-
-
-.menu-item:hover {
-  background: color-mix(in oklab, var(--mat-sys-primary) 10%, transparent);
-}
-.menu-item.active {
-  background: color-mix(in oklab, var(--mat-sys-primary) 16%, transparent);
-}
-
-
-.mi { font-variation-settings: 'opsz' 24; }
-
-
-.divider { height: 1px; background: var(--mat-sys-outline-variant); opacity: .5; margin: 2px 6px; }
-.spacer  { flex: 1 1 auto; }
-
-
-.menu.collapsed .label { display: none; }
-.menu.collapsed .menu-item { justify-content: center; padding: 10px 0; }
-.menu.collapsed .divider   { margin: 2px auto; width: 32px; }
-
-.content { min-height: 100%; }
-
-
-.collapse-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 2px 0 6px;
-}
-
-
-.menu.collapsed .collapse-row { justify-content: center; }
-
-
-
-.collapse-text {
-  font-weight: 600;
-  line-height: 1;
-}
-.collapse-text.hide { display: none; }
+.menu-item.active, .menu-item:hover { background:#f3f4f6; }
+.divider { height:1px; background:rgba(0,0,0,.08); margin:.5rem 0; }
+.spacer  { flex:1 1 auto; }

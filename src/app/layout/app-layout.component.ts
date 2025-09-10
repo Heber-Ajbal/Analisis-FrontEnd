@@ -1,8 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild,OnDestroy, OnInit  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, LayoutModule } from '@angular/cdk/layout';
-
+import { Subject, takeUntil } from 'rxjs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
@@ -24,23 +24,24 @@ import { MatRippleModule } from '@angular/material/core';
   templateUrl: './app-layout.component.html',
   styleUrls: ['./app-layout.component.scss']
 })
-export class AppLayoutComponent {
-  isHandset = false;
-  collapsed = false;
+export class AppLayoutComponent implements OnInit, OnDestroy {
+  collapsed = false;          // rail (72px) cuando true
+  private destroy$ = new Subject<void>();
 
-  constructor(private bp: BreakpointObserver) {
-    this.bp.observe('(max-width: 1024px)').subscribe(r => this.isHandset = r.matches);
+  constructor(private bp: BreakpointObserver) {}
+
+  ngOnInit(): void {
+    // Colapsar automáticamente en pantallas chicas, pero siempre visible
+    this.bp.observe(['(max-width: 1024px)'])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ matches }) => this.collapsed = matches);
   }
 
-  // Menú superior (los habituales)
-  items = [
-    { label: 'Inicio',   icon: 'home',            path: '/home' },
-    { label: 'Buscar',   icon: 'search',          path: '/revision' }, // ajusta si quieres otra ruta
-    { label: 'Alertas',  icon: 'notifications',   path: '/admin'   },  // ajusta si quieres otra ruta
-  ];
+  toggle(): void {
+    this.collapsed = !this.collapsed;
+  }
 
-  // Item fijo abajo
-  profile = { label: 'Perfil', icon: 'person', path: '/perfil' }; // créala o cámbiala por /login si prefieres
-
-    toggle() { this.collapsed = !this.collapsed; }
+  ngOnDestroy(): void {
+    this.destroy$.next(); this.destroy$.complete();
+  }
 }

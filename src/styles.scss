@@ -40,3 +40,10 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+mat-sidenav-container, mat-sidenav-content, .mat-drawer-content {
+  height: 100dvh;
+  background: #fff;
+}
+
+.mat-drawer-inner-container { display: flex; flex-direction: column; }
