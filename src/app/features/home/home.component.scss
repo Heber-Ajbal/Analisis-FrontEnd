@@ -1,0 +1,7 @@
+/* Si no tienes el plugin line-clamp de Tailwind */
+.line-clamp-2 {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+:host ::ng-deep .mat-mdc-unelevated-button,
+:host ::ng-deep .mat-mdc-raised-button { box-shadow: none; }

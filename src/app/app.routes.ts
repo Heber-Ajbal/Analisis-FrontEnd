@@ -1,3 +1,4 @@
+// app.routes.ts
 import { Routes } from '@angular/router';
 
 // Features
@@ -6,6 +7,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { ReviewComponent }   from './features/auth/review/review.component';
 import { HomeComponent }     from './features/home/home.component';
 import { AdminComponent }    from './features/admin/admin.component';
+import { CatalogComponent } from './features/catalog/catalog.component';
 
 // Guards
 import { authGuard }   from './core/guards/auth.guard';
@@ -18,16 +20,16 @@ import { AppLayoutComponent } from './layout/app-layout.component';
 export const routes: Routes = [
   {
     path: '',
-    component: AppLayoutComponent,   
+    component: AppLayoutComponent,
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
-
+      { path: '', redirectTo: 'home', pathMatch: 'full' }, 
       { path: 'login',    component: LoginComponent },
       { path: 'registro', component: RegisterComponent },
 
       { path: 'revision', component: ReviewComponent, canActivate: [reviewGuard] },
-      { path: 'home',     component: HomeComponent,   canActivate: [authGuard]  },
+      { path: 'home',     component: HomeComponent },
       { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
+      { path: 'catalogo', component: CatalogComponent },
     ]
   }
 ];

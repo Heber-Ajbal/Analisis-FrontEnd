@@ -1,0 +1,193 @@
+<div class="w-full grid grid-cols-1 md:grid-cols-[280px_1fr] gap-4 md:gap-6">
+  <!-- ============== FILTROS ============== -->
+  <aside class="order-2 md:order-1">
+    <!-- Móvil: botón para mostrar/ocultar -->
+    <button
+      class="md:hidden mb-3"
+      mat-stroked-button
+      (click)="showFiltersMobile = !showFiltersMobile"
+    >
+      <mat-icon class="mr-1">tune</mat-icon> Filtros
+    </button>
+
+    <!-- Panel de filtros reusable -->
+    <ng-template #filtersPanel>
+      <form
+        [formGroup]="filters"
+        (ngSubmit)="applyAndPersist()"
+        class="border rounded-xl p-4 bg-white"
+      >
+        <h3 class="font-semibold mb-3">Filtros</h3>
+
+        <div class="space-y-4">
+          <!-- Categorías -->
+          <div>
+            <div class="text-sm font-medium mb-2">Categorías</div>
+            <div class="space-y-1">
+              <mat-checkbox
+                *ngFor="let c of categories"
+                (change)="toggleCategory(c, $event.checked)"
+                [checked]="filters.value.categories?.includes(c)"
+              >
+                {{ c | titlecase }}
+              </mat-checkbox>
+            </div>
+          </div>
+
+          <!-- Precio -->
+          <div [formGroup]="filters.controls.price">
+            <div class="text-sm font-medium mb-2 flex items-center justify-between">
+              <span>Rango de precio</span>
+              <span class="text-xs text-gray-500">
+                {{
+                  filters.controls.price.controls.min.value
+                    | currency : 'GTQ' : 'symbol-narrow' : '1.0-0'
+                }}
+                –
+                {{
+                  filters.controls.price.controls.max.value
+                    | currency : 'GTQ' : 'symbol-narrow' : '1.0-0'
+                }}
+              </span>
+            </div>
+
+            <mat-slider [min]="minPrice" [max]="maxPrice" [step]="1" class="w-full">
+              <input matSliderStartThumb formControlName="min" />
+              <input matSliderEndThumb formControlName="max" />
+            </mat-slider>
+          </div>
+
+          <!-- Orden -->
+          <div>
+            <div class="text-sm font-medium mb-2">Ordenar por</div>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select formControlName="sort">
+                <mat-option value="relevance">Relevancia</mat-option>
+                <mat-option value="priceAsc">Precio: menor a mayor</mat-option>
+                <mat-option value="priceDesc">Precio: mayor a menor</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Marcas -->
+          <div>
+            <div class="text-sm font-medium mb-2 flex items-center justify-between">
+              <span>Marcas</span>
+              <button type="button" class="text-xs" mat-button (click)="clearBrandsSelection()">
+                Limpiar
+              </button>
+            </div>
+
+            <!-- Buscador de marcas -->
+            <mat-form-field appearance="outline" class="w-full mb-2">
+              <mat-icon matPrefix>search</mat-icon>
+              <input matInput [formControl]="brandSearch" placeholder="Buscar marca..." />
+              <button
+                mat-icon-button
+                matSuffix
+                *ngIf="brandSearch.value"
+                (click)="clearBrandSearch()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <!-- Chips seleccionables -->
+            <mat-chip-listbox multiple class="flex flex-wrap gap-2">
+              <mat-chip-option
+                *ngFor="let b of filteredBrands"
+                class="rounded-full"
+                [selected]="filters.controls.brands.value.includes(b)"
+                (selectionChange)="onBrandChip(b, $event.selected)"
+              >
+                {{ b }}
+              </mat-chip-option>
+            </mat-chip-listbox>
+
+            <!-- Mostrar más / menos -->
+            <div class="mt-2">
+              <button
+                type="button"
+                mat-button
+                class="text-xs"
+                (click)="showAllBrands = !showAllBrands"
+              >
+                {{ showAllBrands ? 'Mostrar menos' : 'Mostrar más' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <button type="submit" mat-flat-button color="primary" class="flex-1">
+              Aplicar filtros
+            </button>
+            <button type="button" mat-stroked-button class="flex-1" (click)="clearAll()">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </form>
+    </ng-template>
+
+    <!-- Desktop: siempre visible -->
+    <div class="hidden md:block">
+      <ng-container [ngTemplateOutlet]="filtersPanel"></ng-container>
+    </div>
+
+    <!-- Móvil: colapsable -->
+    <div class="md:hidden" *ngIf="showFiltersMobile">
+      <ng-container [ngTemplateOutlet]="filtersPanel"></ng-container>
+    </div>
+  </aside>
+
+  <!-- ============== RESULTADOS ============== -->
+  <section class="order-1 md:order-2">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold">Resultados de búsqueda</h2>
+      <div class="text-sm text-gray-500">Mostrando {{ total }} productos</div>
+    </div>
+
+    <!-- Grid de cards -->
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+      <!-- Skeletons -->
+      <ng-container *ngIf="loading; else productsTpl">
+        <div *ngFor="let _ of skeletons" class="border rounded-xl p-3 bg-white">
+          <div class="h-36 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div class="mt-3 h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+          <div class="mt-2 h-3 bg-gray-100 rounded w-1/2 animate-pulse"></div>
+          <div class="mt-3 h-6 bg-gray-100 rounded w-24 animate-pulse"></div>
+        </div>
+      </ng-container>
+
+      <!-- Productos -->
+      <ng-template #productsTpl>
+        <mat-card *ngFor="let p of paged" class="rounded-xl overflow-hidden">
+          <img mat-card-image [src]="p.image" [alt]="p.name" class="h-36 object-cover" />
+          <mat-card-content>
+            <div class="mt-2 font-semibold">{{ p.name }}</div>
+            <div class="text-sm text-gray-500">{{ p.description }}</div>
+            <div class="mt-2 font-bold">
+              {{ p.price | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="p-3 pt-0 flex items-center justify-between">
+            <span class="text-xs text-gray-500">{{ p.brand }}</span>
+            <button mat-flat-button color="primary" (click)="addToCart(p)">Agregar</button>
+          </mat-card-actions>
+        </mat-card>
+      </ng-template>
+    </div>
+
+    <!-- Paginación -->
+    <div class="flex justify-center mt-4">
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[6, 9, 12, 18]"
+        (page)="onPage($event)"
+      >
+      </mat-paginator>
+    </div>
+  </section>
+</div>
