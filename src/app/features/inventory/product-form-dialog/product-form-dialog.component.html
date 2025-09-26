@@ -1,68 +1,60 @@
-<h2 mat-dialog-title>{{ form.value.id ? 'Editar producto' : 'Nuevo producto' }}</h2>
-<div mat-dialog-content class="dialog-content">
-  <div class="grid">
-    <mat-form-field appearance="outline">
+<form [formGroup]="form" (ngSubmit)="save()">
+  <h2 mat-dialog-title class="title">
+    <mat-icon>inventory_2</mat-icon>
+    <span>{{ form.value.id ? 'Editar producto' : 'Nuevo producto' }}</span>
+  </h2>
+
+  <mat-dialog-content class="content">
+    <mat-form-field appearance="fill">
       <mat-label>SKU</mat-label>
-      <input matInput formControlName="sku" />
+      <input matInput formControlName="sku" placeholder="000123" autocomplete="off" />
+      <mat-error *ngIf="form.get('sku')?.invalid">Requerido</mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" />
+      <input matInput formControlName="nombre" placeholder="Producto X" autocomplete="off" />
+      <mat-error *ngIf="form.get('nombre')?.invalid">Requerido</mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Categoría</mat-label>
-      <input matInput formControlName="categoria" />
+      <input matInput formControlName="categoria" placeholder="Ej. Filtro" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Proveedor</mat-label>
-      <input matInput formControlName="proveedor" />
+      <input matInput formControlName="proveedor" placeholder="Ej. ACME" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="fill">
       <mat-label>Precio</mat-label>
-      <input type="number" matInput formControlName="precio" />
+      <input matInput type="number" min="0" step="0.01" formControlName="precio" placeholder="0.00" />
+      <mat-error *ngIf="form.get('precio')?.hasError('required')">Requerido</mat-error>
+      <mat-error *ngIf="form.get('precio')?.hasError('min')">No puede ser negativo</mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Stock</mat-label>
-      <input type="number" matInput formControlName="stock" />
+    <mat-form-field appearance="fill">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput rows="3" formControlName="description" placeholder="Opcional"></textarea>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Mínimo</mat-label>
-      <input type="number" matInput formControlName="minimo" />
+    <mat-form-field appearance="fill">
+      <mat-label>URL de imagen (UI)</mat-label>
+      <input matInput formControlName="imagenUrl" placeholder="https://..." />
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Estado</mat-label>
-      <mat-select formControlName="estado">
-        <mat-option value="activo">Activo</mat-option>
-        <mat-option value="inactivo">Inactivo</mat-option>
-        <mat-option value="bajo-stock">Bajo stock</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div class="preview" *ngIf="form.value.imagenUrl">
+      <img [src]="form.value.imagenUrl!" alt="preview" />
+    </div>
+  </mat-dialog-content>
 
-    <mat-form-field appearance="outline">
-      <mat-label>URL de imagen</mat-label>
-      <input matInput formControlName="imagenUrl" />
-    </mat-form-field>
-  </div>
-
-  <div class="preview" *ngIf="form.value.imagenUrl">
-    <img [src]="form.value.imagenUrl!" alt="preview" />
-  </div>
-</div>
-<div mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
-  <button mat-flat-button color="primary" (click)="save()" [disabled]="form.invalid">Guardar</button>
-</div>
-
-<style>
-.dialog-content { padding-top: 8px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-.preview { margin-top: 8px; }
-.preview img { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
-</style>
+  <mat-dialog-actions align="end" class="actions">
+    <button mat-button type="button" (click)="close()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+      <mat-icon *ngIf="!loading">save</mat-icon>
+      <mat-icon *ngIf="loading">hourglass_top</mat-icon>
+      <span>{{ loading ? 'Guardando…' : 'Guardar' }}</span>
+    </button>
+  </mat-dialog-actions>
+</form>

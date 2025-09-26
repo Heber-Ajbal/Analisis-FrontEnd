@@ -10,8 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
   template: `
     <div class="flex items-center gap-3">
       <!-- Si hay usuario, muéstralo -->
-      <ng-container *ngIf="auth.user as u; else guest">
-        <span class="text-white/80 text-sm">{{ u.email }} • {{ u.role }}</span>
+      <ng-container *ngIf="auth.isLoggedIn as u; else guest">
         <button class="btn-ghost" (click)="logout()">Salir</button>
       </ng-container>
 

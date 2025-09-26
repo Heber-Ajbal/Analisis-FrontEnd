@@ -43,6 +43,6 @@ export class AuthService {
       this.http.post<LoginResponse>(`${this.API}/auth/new-local`, body)
     );
     if (!res?.jwt) throw new Error('Login sin token');
-    this.token = res.jwt; // ✅ solo guardas el JWT
+    this.token = res.jwt; 
   }
 }
