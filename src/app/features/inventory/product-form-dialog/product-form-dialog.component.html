@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ form.value.id ? 'Editar producto' : 'Nuevo producto' }}</h2>
+<div mat-dialog-content class="dialog-content">
+  <div class="grid">
+    <mat-form-field appearance="outline">
+      <mat-label>SKU</mat-label>
+      <input matInput formControlName="sku" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <input matInput formControlName="categoria" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Proveedor</mat-label>
+      <input matInput formControlName="proveedor" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Precio</mat-label>
+      <input type="number" matInput formControlName="precio" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Stock</mat-label>
+      <input type="number" matInput formControlName="stock" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mínimo</mat-label>
+      <input type="number" matInput formControlName="minimo" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="estado">
+        <mat-option value="activo">Activo</mat-option>
+        <mat-option value="inactivo">Inactivo</mat-option>
+        <mat-option value="bajo-stock">Bajo stock</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>URL de imagen</mat-label>
+      <input matInput formControlName="imagenUrl" />
+    </mat-form-field>
+  </div>
+
+  <div class="preview" *ngIf="form.value.imagenUrl">
+    <img [src]="form.value.imagenUrl!" alt="preview" />
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="form.invalid">Guardar</button>
+</div>
+
+<style>
+.dialog-content { padding-top: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.preview { margin-top: 8px; }
+.preview img { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; }
+</style>

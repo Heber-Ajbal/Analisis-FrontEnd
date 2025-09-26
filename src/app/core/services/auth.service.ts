@@ -1,25 +1,48 @@
-import { Injectable } from '@angular/core';
+// src/app/core/services/auth.service.ts
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type Role = 'cliente' | 'admin_empresa';
 export type Tipo = 'cliente' | 'empresa';
 export interface User { email:string; role:Role; type:Tipo; approved?:boolean; }
 
+type LoginPayload = { identifier: string; password: string };
+type LoginResponse = { jwt: string; user: any };             // lo que muestra tu captura
+type MeResponse = {
+  id: number;
+  email: string;
+  username?: string;
+  confirmed?: boolean;
+  blocked?: boolean;
+  provider?: string;
+  role?: { id: number; name?: string } | number;             // a veces llega id, a veces objeto
+  // ...campos propios: companyId, type, approved, etc.
+};
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private key = 'app:user';
-  private db: User[] = [
-    { email:'cliente@demo.com', role:'cliente',       type:'cliente', approved:true },
-    { email:'admin@empresa.com', role:'admin_empresa', type:'empresa', approved:true },
-    { email:'pendiente@empresa.com', role:'admin_empresa', type:'empresa', approved:false },
-  ];
-  get user():User|null { const r=localStorage.getItem(this.key); return r? JSON.parse(r) as User:null; }
-  set user(u:User|null){ if(u) localStorage.setItem(this.key, JSON.stringify(u)); else localStorage.removeItem(this.key); }
-  login(email:string, pass:string):'ok'|'needs_review'{
-    const u=this.db.find(x=>x.email===email); if(!u) throw new Error('Credenciales inválidas');
-    this.user=u; return (u.type==='empresa' && !u.approved)?'needs_review':'ok';
+  private http = inject(HttpClient);
+  private API = environment.apiBaseUrl; // ej. http://localhost:1337
+  private ACCESS_KEY = 'app:jwt';
+
+  // === token ===
+  get token(): string | null { return localStorage.getItem(this.ACCESS_KEY); }
+  private set token(v: string | null) {
+    if (v) localStorage.setItem(this.ACCESS_KEY, v);
+    else localStorage.removeItem(this.ACCESS_KEY);
   }
-  logout(){ this.user=null; }
-  isLoggedIn(){ return !!this.user; }
-  isAdmin(){ return this.user?.role==='admin_empresa'; }
-  isApproved(){ return !!this.user?.approved; }
+
+  isLoggedIn() { return !!this.token; }
+  logout()     { this.token = null; }
+
+  async login(email: string, password: string): Promise<void> {
+    const body: LoginPayload = { identifier: email, password };
+    const res = await firstValueFrom(
+      this.http.post<LoginResponse>(`${this.API}/auth/new-local`, body)
+    );
+    if (!res?.jwt) throw new Error('Login sin token');
+    this.token = res.jwt; // ✅ solo guardas el JWT
+  }
 }

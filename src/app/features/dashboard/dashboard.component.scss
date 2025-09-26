@@ -1,0 +1,49 @@
+:host { display: block; }
+
+/* Toolbar */
+.toolbar { position: sticky; top: 0; z-index: 10; }
+.title { font-weight: 700; letter-spacing: .3px; }
+.spacer { flex: 1 1 auto; }
+
+/* Layout general */
+.container { display: grid; gap: 20px; padding: 16px; }
+
+/* KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.kpi { padding: 14px; border-radius: 16px; }
+.kpi-content { display: flex; align-items: center; gap: 12px; }
+.kpi-value { font-size: 28px; font-weight: 800; line-height: 1; }
+.kpi-label { opacity: .75; }
+
+/* Charts: tarjetas del mismo alto y canvas 100% */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+}
+.charts-grid.single { grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); }
+.chart-card { border-radius: 20px; }
+
+.chart-wrap {
+  height: 300px;              /* altura estándar */
+  position: relative;         /* importante para Chart.js */
+}
+.chart-wrap.tall { height: 360px; }  /* dona un poco más alta */
+
+.chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;    /* Chart.js toma el alto del contenedor */
+  display: block;
+}
+
+/* Tablas */
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 16px;
+}
+.full-width { width: 100%; }

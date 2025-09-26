@@ -40,30 +40,55 @@
 
       <div class="divider"></div>
 
-      <a class="menu-item" matRipple routerLink="/login" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Login' : ''" matTooltipPosition="right">
-        <mat-icon>login</mat-icon>
-        <span class="label">Login</span>
-      </a>
+      <!-- Mostrar SOLO si NO está logueado -->
+      <ng-container *ngIf="!loggedIn">
+        <a class="menu-item" matRipple routerLink="/login" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Login' : ''" matTooltipPosition="right">
+          <mat-icon>login</mat-icon>
+          <span class="label">Login</span>
+        </a>
 
-      <a class="menu-item" matRipple routerLink="/registro" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Registro' : ''" matTooltipPosition="right">
-        <mat-icon>person_add</mat-icon>
-        <span class="label">Registro</span>
-      </a>
+        <a class="menu-item" matRipple routerLink="/registro" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Registro' : ''" matTooltipPosition="right">
+          <mat-icon>person_add</mat-icon>
+          <span class="label">Registro</span>
+        </a>
+      </ng-container>
+
+      <ng-container *ngIf="loggedIn">
+        <a class="menu-item" matRipple routerLink="/dashboard" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Dashboard' : ''" matTooltipPosition="right">
+          <mat-icon>dashboard</mat-icon>
+          <span class="label">Dashboard</span>
+        </a>
+
+        <a class="menu-item" matRipple routerLink="/inventario" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Inventario' : ''" matTooltipPosition="right">
+          <mat-icon>inventory_2</mat-icon>
+          <span class="label">Inventario</span>
+        </a>
+      </ng-container>
 
       <div class="spacer"></div>
 
-      <a class="menu-item" matRipple routerLink="/perfil" routerLinkActive="active"
+      <!-- Perfil y Logout: SOLO si está logueado -->
+      <a *ngIf="loggedIn" class="menu-item" matRipple routerLink="/perfil" routerLinkActive="active"
          [matTooltip]="collapsed ? 'Perfil' : ''" matTooltipPosition="right">
         <mat-icon>person</mat-icon>
         <span class="label">Perfil</span>
       </a>
+
+      <button *ngIf="loggedIn" type="button" class="menu-item" matRipple
+              [matTooltip]="collapsed ? 'Cerrar sesión' : ''" matTooltipPosition="right"
+              (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span class="label">Cerrar sesión</span>
+      </button>
+
     </div>
   </mat-sidenav>
 
   <mat-sidenav-content class="content">
-    <!-- padding uniforme para todas las páginas -->
     <div class="page">
       <router-outlet></router-outlet>
     </div>

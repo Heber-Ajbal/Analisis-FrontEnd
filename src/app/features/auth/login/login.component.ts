@@ -47,22 +47,18 @@ export class LoginComponent {
     } );
   }
 
-  async submit() {
-    if (this.form.invalid || this.loading) return;
-    this.loading = true;
-    const { email, pass } = this.form.value as { email: string; pass: string };
+async submit() {
+  if (this.form.invalid || this.loading) return;
+  this.loading = true;
+  const { email, pass } = this.form.value as { email: string; pass: string };
 
-    try {
-      const status = this.auth.login(email, pass); // mock front
-      if (status === 'needs_review') {
-        this.router.navigateByUrl('/revision');
-      } else {
-        this.router.navigateByUrl(this.auth.isAdmin() ? '/admin' : '/home');
-      }
-    } catch (e: any) {
-      this.snack.open(e?.message ?? 'Credenciales inválidas', 'Cerrar', { duration: 3000 });
-    } finally {
-      this.loading = false;
-    }
+  try {
+    await this.auth.login(email, pass);   // guarda el JWT
+    this.router.navigateByUrl('/dashboard');   // navega a donde quieras
+  } catch (e: any) {
+    this.snack.open(e?.error?.message ?? e?.message ?? 'Credenciales inválidas', 'Cerrar', { duration: 3000 });
+  } finally {
+    this.loading = false;
   }
+}
 }

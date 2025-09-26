@@ -9,10 +9,15 @@ import { HomeComponent }     from './features/home/home.component';
 import { AdminComponent }    from './features/admin/admin.component';
 import { CatalogComponent } from './features/catalog/catalog.component';
 
+//ADMIN
+import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { InventoryListComponent } from './features/inventory/inventory-list/inventory-list.component';
+
 // Guards
 import { authGuard }   from './core/guards/auth.guard';
 import { adminGuard }  from './core/guards/admin.guard';
 import { reviewGuard } from './core/guards/review.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 // Layout
 import { AppLayoutComponent } from './layout/app-layout.component';
@@ -23,13 +28,16 @@ export const routes: Routes = [
     component: AppLayoutComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' }, 
-      { path: 'login',    component: LoginComponent },
-      { path: 'registro', component: RegisterComponent },
+      { path: 'login',    component: LoginComponent,canActivate: [guestGuard] },
+      { path: 'registro', component: RegisterComponent,canActivate: [guestGuard] },
 
       { path: 'revision', component: ReviewComponent, canActivate: [reviewGuard] },
       { path: 'home',     component: HomeComponent },
       { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
       { path: 'catalogo', component: CatalogComponent },
+      
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'inventario', component: InventoryListComponent /*, canActivate: [adminGuard]*/ },
     ]
   }
 ];
