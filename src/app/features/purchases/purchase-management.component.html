@@ -1,0 +1,271 @@
+<!-- src/app/features/purchases/purchase-management.component.html -->
+<mat-toolbar color="primary" class="page-toolbar">
+  <div class="toolbar-content">
+    <div class="title-group">
+      <h1>Gestión de compras</h1>
+      <p class="subtitle">Controla órdenes de compra, seguimiento y recepción de mercadería.</p>
+    </div>
+
+    <div class="toolbar-actions">
+      <button mat-stroked-button color="accent" (click)="refresh()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon>
+        Actualizar
+      </button>
+      <button mat-flat-button color="accent">
+        <mat-icon>add</mat-icon>
+        Nueva compra
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+<div class="page-grid" [class.loading]="loading()">
+  <section class="sidebar">
+    <mat-card class="summary-card" *ngFor="let card of summaryCards(); trackBy: trackBySummary">
+      <div class="summary-icon" [class]="card.tone">
+        <mat-icon>{{ card.icon }}</mat-icon>
+      </div>
+      <div class="summary-body">
+        <p class="summary-label">{{ card.label }}</p>
+        <p class="summary-value">{{ card.value }}</p>
+        <p class="summary-helper" *ngIf="card.helper">{{ card.helper }}</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="filters-card">
+      <div class="card-header">
+        <h2>Filtros</h2>
+        <button mat-button type="button" (click)="clearFilters()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar
+        </button>
+      </div>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Búsqueda</mat-label>
+        <input matInput placeholder="Folio, proveedor..." [ngModel]="search()" (ngModelChange)="search.set($event)" />
+        <button mat-icon-button matSuffix *ngIf="search()" (click)="search.set('')" tabindex="-1">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Estado</mat-label>
+        <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+          <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Proveedor</mat-label>
+        <mat-select [ngModel]="supplierFilter()" (ngModelChange)="supplierFilter.set($event)">
+          <mat-option value="todos">Todos</mat-option>
+          <mat-option *ngFor="let supplier of suppliers()" [value]="supplier">
+            {{ supplierLabel(supplier) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Periodo</mat-label>
+        <mat-select [ngModel]="periodFilter()" (ngModelChange)="periodFilter.set($event)">
+          <mat-option *ngFor="let option of periodOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card>
+  </section>
+
+  <section class="purchases-list">
+    <mat-card class="list-card">
+      <div class="card-header">
+        <div>
+          <h2>Órdenes de compra</h2>
+          <p class="helper">{{ filtered().length }} resultados</p>
+        </div>
+      </div>
+
+      <ng-container *ngIf="filtered().length; else emptyState">
+        <div class="list-wrapper">
+          <article
+            class="purchase-row"
+            *ngFor="let purchase of filtered(); trackBy: trackByPurchase"
+            (click)="selectPurchase(purchase)"
+            [class.active]="selected()?.id === purchase.id"
+          >
+            <div class="row-main">
+              <div class="row-title">
+                <h3>{{ purchase.folio }}</h3>
+                <mat-chip-set>
+                  <mat-chip [ngClass]="getStatusClass(purchase.estado)">
+                    {{ getStatusLabel(purchase.estado) }}
+                  </mat-chip>
+                  <mat-chip [ngClass]="getPaymentClass(purchase.pagoEstado)">
+                    {{ getPaymentLabel(purchase.pagoEstado) }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+              <p class="row-subtitle">{{ purchase.proveedor }} · {{ purchase.warehouse }}</p>
+              <p class="row-date">
+                Creada {{ purchase.fecha | date: 'mediumDate' }} · Actualizada {{ purchase.updatedAt | date: 'short' }}
+              </p>
+            </div>
+
+            <div class="row-stats">
+              <div>
+                <span class="label">Total</span>
+                <span class="value">{{ formatCurrency(purchase.total, purchase.moneda) }}</span>
+              </div>
+              <div>
+                <span class="label">Avance</span>
+                <span class="value">{{ getReceivedPercentage(purchase) }}%</span>
+              </div>
+              <div>
+                <span class="label">Pendiente</span>
+                <span class="value">{{ formatCurrency(getPendingValue(purchase), purchase.moneda) }}</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </ng-container>
+    </mat-card>
+  </section>
+
+  <section class="purchase-detail" *ngIf="selected() as selection">
+    <mat-card>
+      <div class="detail-header">
+        <div>
+          <p class="detail-date">Actualizado {{ selection.updatedAt | date: 'medium' }}</p>
+          <h2>{{ selection.folio }}</h2>
+          <p class="detail-subtitle">Proveedor: {{ selection.proveedor }} · {{ selection.warehouse }}</p>
+        </div>
+        <mat-chip-set class="status-chips">
+          <mat-chip [ngClass]="getStatusClass(selection.estado)">
+            {{ getStatusLabel(selection.estado) }}
+          </mat-chip>
+          <mat-chip [ngClass]="getPaymentClass(selection.pagoEstado)">
+            {{ getPaymentLabel(selection.pagoEstado) }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="detail-meta">
+        <div>
+          <span class="label">Fecha de emisión</span>
+          <span class="value">{{ selection.fecha | date: 'medium' }}</span>
+        </div>
+        <div>
+          <span class="label">Llegada estimada</span>
+          <span class="value">{{ selection.llegadaEstimada ? (selection.llegadaEstimada | date: 'medium') : 'Por definir' }}</span>
+        </div>
+        <div>
+          <span class="label">Monto total</span>
+          <span class="value">{{ formatCurrency(selection.total, selection.moneda) }}</span>
+        </div>
+        <div>
+          <span class="label">Pendiente</span>
+          <span class="value warning">{{ formatCurrency(getPendingValue(selection), selection.moneda) }}</span>
+        </div>
+        <div>
+          <span class="label">Creado por</span>
+          <span class="value">{{ selection.createdBy }}</span>
+        </div>
+        <div>
+          <span class="label">Notas</span>
+          <span class="value">{{ selection.notas || 'Sin notas' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-actions" *ngIf="nextStatuses().length">
+        <p class="label">Actualizar estado</p>
+        <div class="actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            *ngFor="let status of nextStatuses()"
+            (click)="updateStatus(status)"
+          >
+            <mat-icon>check_circle</mat-icon>
+            {{ getStatusLabel(status) }}
+          </button>
+        </div>
+      </div>
+
+      <section class="items-section">
+        <div class="section-header">
+          <h3>Detalle de artículos</h3>
+          <span>{{ selection.items.length }} ítems · {{ getReceivedPercentage(selection) }}% recibido</span>
+        </div>
+        <div class="items-table">
+          <div class="items-header">
+            <span>SKU</span>
+            <span>Descripción</span>
+            <span class="numeric">Solicitado</span>
+            <span class="numeric">Recibido</span>
+            <span class="numeric">Pendiente</span>
+            <span class="numeric">Total</span>
+          </div>
+          <div class="items-row" *ngFor="let item of selection.items; trackBy: trackByItem">
+            <span class="sku">{{ item.sku }}</span>
+            <div class="description">
+              <p>{{ item.nombre }}</p>
+              <small>{{ item.categoria }}</small>
+              <div class="progress">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="item.cantidad ? (item.recibido / item.cantidad) * 100 : 0"
+                ></mat-progress-bar>
+                <small *ngIf="item.fechaEsperada">ETA {{ item.fechaEsperada | date: 'mediumDate' }}</small>
+              </div>
+            </div>
+            <span class="numeric">{{ item.cantidad }}</span>
+            <span class="numeric">{{ item.recibido }}</span>
+            <span class="numeric warning">{{ getPendingUnits(item) }}</span>
+            <span class="numeric">{{ formatCurrency(getItemTotal(item), selection.moneda) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="timeline-section">
+        <div class="section-header">
+          <h3>Historial</h3>
+        </div>
+        <mat-list>
+          <mat-list-item *ngFor="let step of selection.timeline; trackBy: trackByTimeline">
+            <div matListItemIcon class="timeline-icon">
+              <mat-icon>radio_button_checked</mat-icon>
+            </div>
+            <div matListItemTitle>{{ getStatusLabel(step.estado) }}</div>
+            <div matListItemLine>{{ step.fecha | date: 'medium' }}</div>
+            <div matListItemLine *ngIf="step.descripcion" class="timeline-note">{{ step.descripcion }}</div>
+          </mat-list-item>
+        </mat-list>
+      </section>
+
+      <section class="documents-section" *ngIf="selection.documentos?.length">
+        <div class="section-header">
+          <h3>Documentos</h3>
+        </div>
+        <ul>
+          <li *ngFor="let doc of selection.documentos">
+            <mat-icon>description</mat-icon>
+            <span>{{ doc.tipo }} · {{ doc.referencia }}</span>
+          </li>
+        </ul>
+      </section>
+    </mat-card>
+  </section>
+</div>
+
+<ng-template #emptyState>
+  <div class="empty-state">
+    <mat-icon>assignment</mat-icon>
+    <p>No hay compras en este filtro.</p>
+    <button mat-stroked-button color="primary" (click)="clearFilters()">Restablecer filtros</button>
+  </div>
+</ng-template>

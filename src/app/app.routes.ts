@@ -13,6 +13,7 @@ import { CartComponent } from './features/cart/cart.component';
 //ADMIN
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { InventoryListComponent } from './features/inventory/inventory-list/inventory-list.component';
+import { PurchaseManagementComponent } from './features/purchases/purchase-management.component';
 
 // Guards
 import { authGuard }   from './core/guards/auth.guard';
@@ -37,9 +38,10 @@ export const routes: Routes = [
       { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
       { path: 'catalogo', component: CatalogComponent },
       { path: 'carrito', component: CartComponent },
-      
+
       { path: 'dashboard', component: DashboardComponent },
       { path: 'inventario', component: InventoryListComponent /*, canActivate: [adminGuard]*/ },
+      { path: 'compras', component: PurchaseManagementComponent /*, canActivate: [adminGuard]*/ },
     ]
   }
 ];
