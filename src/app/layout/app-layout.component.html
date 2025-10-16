@@ -32,6 +32,12 @@
         <span class="label">Buscar</span>
       </a>
 
+      <a class="menu-item" matRipple routerLink="/carrito" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Carrito' : ''" matTooltipPosition="right">
+        <mat-icon>shopping_cart</mat-icon>
+        <span class="label">Carrito</span>
+      </a>
+
       <a class="menu-item" matRipple routerLink="/admin" routerLinkActive="active"
          [matTooltip]="collapsed ? 'Alertas' : ''" matTooltipPosition="right">
         <mat-icon>notifications</mat-icon>
