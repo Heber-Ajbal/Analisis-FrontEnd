@@ -1,0 +1,195 @@
+<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+  <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-blue-600 font-semibold">Carrito de compras</p>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Revisa los repuestos antes de pagar</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Gestiona cantidades, selecciona el método de envío y aplica cupones promocionales.
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <button
+        mat-stroked-button
+        color="primary"
+        class="h-10"
+        (click)="clearCart()"
+        [disabled]="!cartItems.length"
+      >
+        <mat-icon class="!mr-2">delete_sweep</mat-icon>
+        Vaciar carrito
+      </button>
+      <a mat-stroked-button color="primary" routerLink="/catalogo" class="h-10 flex items-center gap-2">
+        <mat-icon>arrow_back</mat-icon>
+        Seguir comprando
+      </a>
+    </div>
+  </header>
+
+  <div class="grid gap-6 xl:grid-cols-[2fr_1fr]">
+    <section class="space-y-4" aria-label="Resumen de productos en el carrito">
+      <ng-container *ngIf="cartItems.length; else emptyState">
+        <mat-card *ngFor="let item of cartItems; trackBy: trackById" class="rounded-2xl shadow-sm border border-gray-100">
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="shrink-0 overflow-hidden rounded-xl sm:w-40 aspect-video">
+              <img [src]="item.image" [alt]="item.name" class="h-full w-full object-cover" />
+            </div>
+
+            <div class="flex flex-1 flex-col gap-3">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">{{ item.name }}</h2>
+                  <p class="text-sm text-blue-600 font-medium">{{ item.brand }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Compatibilidad: {{ item.compatibility }}</p>
+                </div>
+                <button mat-icon-button color="warn" class="-mr-2" (click)="removeItem(item.id)" aria-label="Eliminar">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs uppercase tracking-wide text-gray-400">Cantidad</span>
+                  <div class="flex items-center rounded-full border border-gray-200 bg-gray-50">
+                    <button
+                      mat-icon-button
+                      type="button"
+                      (click)="updateQuantity(item.id, -1)"
+                      [disabled]="item.quantity <= 1"
+                      class="h-9 w-9"
+                      aria-label="Disminuir cantidad"
+                    >
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="w-10 text-center font-semibold">{{ item.quantity }}</span>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      (click)="updateQuantity(item.id, 1)"
+                      [disabled]="item.quantity >= item.stock"
+                      class="h-9 w-9"
+                      aria-label="Aumentar cantidad"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                  <span class="text-xs text-gray-500">{{ item.stock }} disponibles</span>
+                </div>
+
+                <div class="text-right">
+                  <p class="text-sm text-gray-500">Precio unitario</p>
+                  <p class="text-xl font-bold text-gray-900">
+                    {{ item.price | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+                  </p>
+                  <p class="text-xs text-gray-400 mt-1">
+                    Subtotal: {{ (item.price * item.quantity) | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </ng-container>
+    </section>
+
+    <aside class="space-y-4" aria-label="Acciones del carrito">
+      <mat-card class="rounded-2xl shadow-sm border border-gray-100">
+        <mat-card-content class="space-y-4">
+          <div class="flex items-baseline justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Resumen</h2>
+            <span class="text-sm text-gray-500">{{ totalUnits }} {{ totalUnits === 1 ? 'producto' : 'productos' }}</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-sm">
+              <span>Subtotal</span>
+              <span>{{ subtotal | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm" [class.text-green-600]="discount > 0">
+              <span>Descuento</span>
+              <span>-{{ discount | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span>Envío</span>
+              <span>{{ shippingCost | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="flex items-center justify-between text-lg font-bold text-gray-900">
+              <span>Total</span>
+              <span>{{ total | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
+            </div>
+          </div>
+
+          <button
+            mat-flat-button
+            color="primary"
+            class="w-full h-12 text-base"
+            [disabled]="!cartItems.length"
+          >
+            Proceder al pago
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="rounded-2xl shadow-sm border border-gray-100">
+        <mat-card-content class="space-y-4">
+          <h3 class="text-base font-semibold text-gray-900">Método de envío</h3>
+          <div class="grid gap-2">
+            <button
+              mat-stroked-button
+              *ngFor="let option of shippingOptions"
+              class="w-full justify-between !py-4"
+              [color]="option.id === selectedShipping.id ? 'primary' : undefined"
+              [class.bg-blue-50]="option.id === selectedShipping.id"
+              (click)="selectShipping(option)"
+              type="button"
+            >
+              <span class="text-left">
+                <span class="block font-medium">{{ option.label }}</span>
+                <span class="block text-xs text-gray-500">{{ option.description }}</span>
+              </span>
+              <span class="font-semibold">
+                {{ option.cost | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+              </span>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="rounded-2xl shadow-sm border border-gray-100">
+        <mat-card-content class="space-y-3">
+          <h3 class="text-base font-semibold text-gray-900">Cupón de descuento</h3>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Código promocional</mat-label>
+            <input matInput [(ngModel)]="couponCode" placeholder="AHORRA10" />
+          </mat-form-field>
+          <div class="flex gap-2">
+            <button mat-stroked-button color="primary" class="flex-1" type="button" (click)="applyCoupon()">
+              Aplicar
+            </button>
+            <button mat-button type="button" class="flex-1" (click)="couponCode = ''">
+              Limpiar
+            </button>
+          </div>
+          <p class="text-sm" [class.text-green-600]="couponSuccess" [class.text-red-500]="!couponSuccess">
+            {{ couponMessage }}
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+  </div>
+</div>
+
+<ng-template #emptyState>
+  <mat-card class="rounded-2xl border border-dashed border-gray-200 bg-gray-50">
+    <mat-card-content class="flex flex-col items-center gap-4 py-12">
+      <mat-icon fontSet="material-icons-outlined" class="text-4xl text-gray-400">shopping_cart</mat-icon>
+      <div class="text-center space-y-2">
+        <h2 class="text-xl font-semibold text-gray-900">Tu carrito está vacío</h2>
+        <p class="text-sm text-gray-500">Explora el catálogo y agrega repuestos para continuar con la compra.</p>
+      </div>
+      <a mat-flat-button color="primary" routerLink="/catalogo">Ir al catálogo</a>
+    </mat-card-content>
+  </mat-card>
+</ng-template>

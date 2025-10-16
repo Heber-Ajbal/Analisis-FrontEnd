@@ -8,6 +8,7 @@ import { ReviewComponent }   from './features/auth/review/review.component';
 import { HomeComponent }     from './features/home/home.component';
 import { AdminComponent }    from './features/admin/admin.component';
 import { CatalogComponent } from './features/catalog/catalog.component';
+import { CartComponent } from './features/cart/cart.component';
 
 //ADMIN
 import { DashboardComponent } from './features/dashboard/dashboard.component';
@@ -35,6 +36,7 @@ export const routes: Routes = [
       { path: 'home',     component: HomeComponent },
       { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
       { path: 'catalogo', component: CatalogComponent },
+      { path: 'carrito', component: CartComponent },
       
       { path: 'dashboard', component: DashboardComponent },
       { path: 'inventario', component: InventoryListComponent /*, canActivate: [adminGuard]*/ },
