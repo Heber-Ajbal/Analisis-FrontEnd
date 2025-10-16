@@ -73,6 +73,12 @@
           <mat-icon>inventory_2</mat-icon>
           <span class="label">Inventario</span>
         </a>
+
+        <a class="menu-item" matRipple routerLink="/compras" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Compras' : ''" matTooltipPosition="right">
+          <mat-icon>shopping_bag</mat-icon>
+          <span class="label">Compras</span>
+        </a>
       </ng-container>
 
       <div class="spacer"></div>
