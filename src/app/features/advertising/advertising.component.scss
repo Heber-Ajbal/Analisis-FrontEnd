@@ -1,0 +1,264 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.toolbar {
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.18);
+}
+
+.toolbar-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.heading h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.heading .subtitle {
+  margin: 4px 0 0;
+  opacity: 0.85;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.summary-card {
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-card .label {
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.summary-card .value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.summary-card .helper {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+}
+
+.content {
+  display: grid;
+  gap: 24px;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.campaign-card {
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-header .title {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.card-header .title mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.card-header .meta {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.status.small {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metrics .label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.metrics .value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.campaign-list {
+  padding: 0;
+}
+
+.campaign-list mat-list-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.campaign-list mat-list-item:last-child {
+  border-bottom: none;
+}
+
+.campaign-list .secondary {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.empty {
+  margin: 24px auto;
+  padding: 32px;
+  text-align: center;
+  display: grid;
+  gap: 16px;
+  max-width: 360px;
+}
+
+.empty mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  color: rgba(25, 118, 210, 0.8);
+}
+
+.chip-muted {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.chip-info {
+  background: rgba(33, 150, 243, 0.15);
+  color: #1565c0;
+}
+
+.chip-success {
+  background: rgba(46, 125, 50, 0.15);
+  color: #1b5e20;
+}
+
+.chip-warning {
+  background: rgba(255, 152, 0, 0.18);
+  color: #e65100;
+}
+
+.chip-neutral {
+  background: rgba(120, 144, 156, 0.16);
+  color: #37474f;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .campaign-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
