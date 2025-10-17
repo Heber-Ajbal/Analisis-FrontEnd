@@ -85,6 +85,12 @@
           <mat-icon>shopping_bag</mat-icon>
           <span class="label">Compras</span>
         </a>
+
+        <a class="menu-item" matRipple routerLink="/usuarios" routerLinkActive="active"
+           [matTooltip]="collapsed ? 'Usuarios' : ''" matTooltipPosition="right">
+          <mat-icon>user</mat-icon>
+          <span class="label">Usuario</span>
+        </a>
       </ng-container>
 
       <div class="spacer"></div>
