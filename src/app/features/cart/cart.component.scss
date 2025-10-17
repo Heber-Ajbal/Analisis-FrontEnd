@@ -22,3 +22,51 @@ button.mat-mdc-button-base {
 button[mat-stroked-button].bg-blue-50 {
   border-color: rgba(37, 99, 235, 0.4);
 }
+
+// Estilos para el formulario de pago
+mat-form-field {
+  ::ng-deep .mat-mdc-form-field-error {
+    font-size: 0.75rem;
+  }
+}
+
+mat-card-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+
+  mat-card-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// Animación suave para entrada del formulario
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+mat-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+// Estilos para inputs de tarjeta
+mat-form-field input[type="password"] {
+  letter-spacing: 0.5px;
+}
+
+// Responsive
+@media (max-width: 640px) {
+  mat-card-content {
+    padding: 1rem;
+  }
+}

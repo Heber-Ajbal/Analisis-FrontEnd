@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { CartService } from './cart.service';
 
 interface CartItem {
   id: string;
@@ -34,17 +36,19 @@ interface ShippingOption {
     CommonModule,
     RouterLink,
     FormsModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatDialogModule,
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
 })
-export class CartComponent {
+export class CartComponent implements OnInit {
   cartItems: CartItem[] = [
     {
       id: 'oil-filter-honda',
@@ -104,6 +108,43 @@ export class CartComponent {
   appliedCoupon: 'AHORRA10' | null = null;
   couponMessage = 'Ingresa un código para aplicar un descuento.';
   couponSuccess = false;
+
+  paymentForm: FormGroup;
+  showPaymentForm = false;
+
+  constructor(
+    private cartService: CartService,
+    private router: Router,
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) {
+    this.paymentForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+      address: ['', [Validators.required, Validators.minLength(5)]],
+      city: ['', Validators.required],
+      postalCode: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      cardName: ['', [Validators.required, Validators.minLength(3)]],
+      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
+      expiryDate: ['', [Validators.required, Validators.pattern(/^\d{2}\/\d{2}$/)]],
+      cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
+    });
+  }
+
+  ngOnInit() {
+    // Cargar datos del carrito desde el servicio si existen
+    const state = this.cartService.getCurrentCartState();
+    if (state.items.length > 0) {
+      this.cartItems = state.items;
+    }
+    if (state.shipping) {
+      this.selectedShipping = state.shipping;
+    }
+    if (state.coupon) {
+      this.appliedCoupon = state.coupon;
+    }
+  }
 
   get subtotal(): number {
     return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -172,6 +213,80 @@ export class CartComponent {
   clearCart(): void {
     this.cartItems = [];
     this.appliedCoupon = null;
+  }
+
+  proceedToCheckout(): void {
+    // Guardar estado actual en el servicio
+    this.cartService.setCartItems(this.cartItems);
+    this.cartService.setSelectedShipping(this.selectedShipping);
+    this.cartService.setAppliedCoupon(this.appliedCoupon);
+
+    // Mostrar formulario de pago
+    this.showPaymentForm = true;
+  }
+
+  cancelPayment(): void {
+    this.showPaymentForm = false;
+    this.paymentForm.reset();
+  }
+
+  submitPayment(): void {
+    if (this.paymentForm.invalid) {
+      Object.keys(this.paymentForm.controls).forEach((key) => {
+        this.paymentForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
+
+    const formData = this.paymentForm.value;
+    const orderData = {
+      items: this.cartItems,
+      shipping: this.selectedShipping,
+      coupon: this.appliedCoupon,
+      subtotal: this.subtotal,
+      discount: this.discount,
+      shippingCost: this.shippingCost,
+      total: this.total,
+      paymentInfo: formData,
+      orderDate: new Date(),
+    };
+
+    console.log('Orden procesada:', orderData);
+
+    // Aquí iría la llamada al backend para procesar el pago
+    // this.checkoutService.processOrder(orderData).subscribe(...)
+
+    // Por ahora, mostrar confirmación y limpiar
+    alert(`✓ Pago procesado exitosamente!\nTotal: Q${this.total.toFixed(2)}`);
+    this.clearCart();
+    this.showPaymentForm = false;
+    this.paymentForm.reset();
+    this.router.navigate(['/catalogo']);
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.paymentForm.get(fieldName);
+    if (!control || !control.errors || !control.touched) {
+      return '';
+    }
+
+    if (control.errors['required']) {
+      return 'Este campo es requerido';
+    }
+    if (control.errors['minlength']) {
+      return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
+    }
+    if (control.errors['email']) {
+      return 'Email no válido';
+    }
+    if (control.errors['pattern']) {
+      if (fieldName === 'phone') return 'Debe ser 8 dígitos';
+      if (fieldName === 'postalCode') return 'Debe ser 5 dígitos';
+      if (fieldName === 'cardNumber') return 'Debe ser 16 dígitos';
+      if (fieldName === 'expiryDate') return 'Formato: MM/AA';
+      if (fieldName === 'cvv') return 'Debe ser 3 dígitos';
+    }
+    return '';
   }
 
   trackById(_: number, item: CartItem): string {

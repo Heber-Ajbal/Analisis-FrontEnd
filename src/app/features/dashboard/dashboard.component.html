@@ -1,124 +1,835 @@
-<mat-toolbar color="primary" class="toolbar">
-  <span class="title">Panel administrativo</span>
-  <span class="spacer"></span>
+<!-- ============================================================================
+     MODERN DASHBOARD TEMPLATE
+     Enhanced UI with gradients, shadows, and smooth animations
+     ============================================================================ -->
 
-  <button mat-button [matMenuTriggerFor]="menuRango">
-    <mat-icon>schedule</mat-icon>&nbsp;{{ rango() | uppercase }}
-  </button>
-  <mat-menu #menuRango="matMenu">
-    <button mat-menu-item (click)="rango.set('7d')">Últimos 7 días</button>
-    <button mat-menu-item (click)="rango.set('30d')">Últimos 30 días</button>
-    <button mat-menu-item (click)="rango.set('ytd')">YTD</button>
-    <button mat-menu-item (click)="rango.set('12m')">12 meses</button>
+<!-- Header con gradiente moderno -->
+<mat-toolbar class="modern-toolbar">
+  <div class="toolbar-content">
+    <div class="toolbar-left">
+      <mat-icon class="dashboard-icon">dashboard</mat-icon>
+      <span class="title">Panel Administrativo</span>
+      
+    </div>
+    
+    <div class="toolbar-right">
+      <button mat-button class="time-range-btn" [matMenuTriggerFor]="menuRango">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ rango() | uppercase }}</span>
+        <mat-icon class="dropdown-icon">expand_more</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-menu #menuRango="matMenu" class="modern-menu">
+    <button mat-menu-item (click)="rango.set('7d')">
+      <mat-icon>calendar_today</mat-icon>
+      <span>Últimos 7 días</span>
+    </button>
+    <button mat-menu-item (click)="rango.set('30d')">
+      <mat-icon>date_range</mat-icon>
+      <span>Últimos 30 días</span>
+    </button>
+    <button mat-menu-item (click)="rango.set('ytd')">
+      <mat-icon>trending_up</mat-icon>
+      <span>YTD</span>
+    </button>
+    <button mat-menu-item (click)="rango.set('12m')">
+      <mat-icon>insights</mat-icon>
+      <span>12 meses</span>
+    </button>
   </mat-menu>
 </mat-toolbar>
 
-<div class="container">
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <mat-card class="kpi" *ngFor="let k of kpis">
-      <div class="kpi-content">
-        <mat-icon>{{ k.icon }}</mat-icon>
-        <div>
+<div class="dashboard-container">
+  <!-- KPIs con diseño moderno -->
+  <div class="kpi-section">
+    <div class="section-header">
+      <h2>Métricas Clave</h2>
+      <span class="update-time">Actualizado hace 5 min</span>
+    </div>
+    
+    <div class="kpi-grid">
+      <mat-card class="kpi-card gradient-blue" *ngFor="let k of kpis; let i = index" 
+                [class.animate-in]="true" 
+                [style.animation-delay.ms]="i * 100">
+        <div class="kpi-header">
+          <div class="icon-wrapper">
+            <mat-icon>{{ k.icon }}</mat-icon>
+          </div>
+          <span class="kpi-trend">
+            <mat-icon class="trend-icon up">trending_up</mat-icon>
+            <span class="trend-value">+12%</span>
+          </span>
+        </div>
+        <div class="kpi-body">
           <div class="kpi-value">{{ k.value | number }}</div>
           <div class="kpi-label">{{ k.label }}</div>
         </div>
-      </div>
-    </mat-card>
+        <div class="kpi-footer">
+          <span class="kpi-subtitle">vs. período anterior</span>
+        </div>
+      </mat-card>
+    </div>
   </div>
 
-  <!-- Fila 1: 2 charts -->
-  <div class="charts-grid">
-    <mat-card class="chart-card">
-      <mat-card-title>Evolución de Ventas</mat-card-title>
-      <mat-card-content>
-        <div class="chart-wrap">
-          <canvas baseChart
-                  [type]="lineChartType"
-                  [data]="lineChartData"
-                  [options]="lineChartOptions">
-          </canvas>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Gráficos principales -->
+  <div class="charts-section">
+    <div class="section-header">
+      <h2>Análisis Visual</h2>
+    </div>
 
-    <mat-card class="chart-card">
-      <mat-card-title>Inventario vs. Rotación</mat-card-title>
-      <mat-card-content>
-        <div class="chart-wrap">
-          <canvas baseChart
-                  [data]="mixChartData"
-                  [options]="mixChartOptions">
-          </canvas>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <div class="charts-grid-two">
+      <mat-card class="chart-card elevated">
+        <mat-card-header>
+          <div class="card-title-wrapper">
+            <mat-icon class="title-icon">show_chart</mat-icon>
+            <mat-card-title>Evolución de Ventas</mat-card-title>
+          </div>
+          <button mat-icon-button class="card-menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [type]="lineChartType"
+                    [data]="lineChartData"
+                    [options]="lineChartOptions">
+            </canvas>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item">
+              <span class="legend-dot blue"></span>
+              Ventas totales
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card elevated">
+        <mat-card-header>
+          <div class="card-title-wrapper">
+            <mat-icon class="title-icon">inventory_2</mat-icon>
+            <mat-card-title>Inventario vs. Rotación</mat-card-title>
+          </div>
+          <button mat-icon-button class="card-menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [data]="mixChartData"
+                    [options]="mixChartOptions">
+            </canvas>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item">
+              <span class="legend-dot purple"></span>
+              Stock disponible
+            </span>
+            <span class="legend-item">
+              <span class="legend-dot orange"></span>
+              Rotación
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Gráfico de dona -->
+    <div class="charts-grid-single">
+      <mat-card class="chart-card elevated wide">
+        <mat-card-header>
+          <div class="card-title-wrapper">
+            <mat-icon class="title-icon">pie_chart</mat-icon>
+            <mat-card-title>Distribución por Categoría</mat-card-title>
+          </div>
+          <button mat-icon-button class="card-menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper doughnut">
+            <canvas baseChart
+                    [type]="doughnutType"
+                    [data]="doughnutData"
+                    [options]="doughnutOptions">
+            </canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 
-  <!-- Fila 2: 1 chart ancho -->
-  <div class="charts-grid single">
-    <mat-card class="chart-card">
-      <mat-card-title>Distribución por Categoría</mat-card-title>
-      <mat-card-content>
-        <div class="chart-wrap tall">
-          <canvas baseChart
-                  [type]="doughnutType"
-                  [data]="doughnutData"
-                  [options]="doughnutOptions">
-          </canvas>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  <!-- Tablas de datos -->
+  <div class="tables-section">
+    <div class="section-header">
+      <h2>Detalles de Inventario</h2>
+    </div>
 
-  <!-- Tablas -->
-  <div class="tables-grid">
-    <mat-card>
-      <mat-card-title>Top Productos</mat-card-title>
-      <mat-card-content>
-        <table mat-table [dataSource]="topProductos" class="mat-elevation-z1 full-width">
-          <ng-container matColumnDef="sku">
-            <th mat-header-cell *matHeaderCellDef>SKU</th>
-            <td mat-cell *matCellDef="let e">{{ e.sku }}</td>
-          </ng-container>
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Producto</th>
-            <td mat-cell *matCellDef="let e">{{ e.nombre }}</td>
-          </ng-container>
-          <ng-container matColumnDef="stock">
-            <th mat-header-cell *matHeaderCellDef>Stock</th>
-            <td mat-cell *matCellDef="let e">{{ e.stock }}</td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
+    <div class="tables-grid">
+      <mat-card class="table-card elevated">
+        <mat-card-header>
+          <div class="card-title-wrapper">
+            <mat-icon class="title-icon success">stars</mat-icon>
+            <mat-card-title>Top Productos</mat-card-title>
+          </div>
+          <button mat-button color="primary" class="action-btn">
+            Ver todos
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="topProductos" class="modern-table">
+              <ng-container matColumnDef="sku">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">tag</mat-icon>
+                    SKU
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="sku-badge">{{ e.sku }}</span>
+                </td>
+              </ng-container>
+              
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">inventory</mat-icon>
+                    Producto
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="product-name">{{ e.nombre }}</span>
+                </td>
+              </ng-container>
+              
+              <ng-container matColumnDef="stock">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">storage</mat-icon>
+                    Stock
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="stock-value success">{{ e.stock }}</span>
+                </td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-    <mat-card>
-      <mat-card-title>Reposiciones Pendientes</mat-card-title>
-      <mat-card-content>
-        <table mat-table [dataSource]="pendientes" class="mat-elevation-z1 full-width">
-          <ng-container matColumnDef="sku">
-            <th mat-header-cell *matHeaderCellDef>SKU</th>
-            <td mat-cell *matCellDef="let e">{{ e.sku }}</td>
-          </ng-container>
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef>Producto</th>
-            <td mat-cell *matCellDef="let e">{{ e.nombre }}</td>
-          </ng-container>
-          <ng-container matColumnDef="minimo">
-            <th mat-header-cell *matHeaderCellDef>Mín.</th>
-            <td mat-cell *matCellDef="let e">{{ e.minimo }}</td>
-          </ng-container>
-          <ng-container matColumnDef="actual">
-            <th mat-header-cell *matHeaderCellDef>Actual</th>
-            <td mat-cell *matCellDef="let e">{{ e.actual }}</td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumnsPend"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumnsPend;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
+      <mat-card class="table-card elevated alert">
+        <mat-card-header>
+          <div class="card-title-wrapper">
+            <mat-icon class="title-icon warning">warning</mat-icon>
+            <mat-card-title>Reposiciones Pendientes</mat-card-title>
+          </div>
+          <span class="alert-badge">{{ pendientes.length }} alertas</span>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="pendientes" class="modern-table">
+              <ng-container matColumnDef="sku">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">tag</mat-icon>
+                    SKU
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="sku-badge warning">{{ e.sku }}</span>
+                </td>
+              </ng-container>
+              
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">inventory</mat-icon>
+                    Producto
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="product-name">{{ e.nombre }}</span>
+                </td>
+              </ng-container>
+              
+              <ng-container matColumnDef="minimo">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">priority_high</mat-icon>
+                    Mín.
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="stock-value">{{ e.minimo }}</span>
+                </td>
+              </ng-container>
+              
+              <ng-container matColumnDef="actual">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="header-content">
+                    <mat-icon class="header-icon">inventory_2</mat-icon>
+                    Actual
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let e">
+                  <span class="stock-value danger">{{ e.actual }}</span>
+                </td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsPend"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsPend;" class="table-row"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>
+
+<!-- ============================================================================
+     STYLES - Modern & Attractive Design
+     ============================================================================ -->
+<style>
+  /* Variables de color modernas */
+  :host {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --blue-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --purple-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    --success-gradient: linear-gradient(135deg, #81fbb8 0%, #28c76f 100%);
+    --warning-gradient: linear-gradient(135deg, #ffd89b 0%, #ff6a00 100%);
+    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    
+    --bg-primary: #f8f9fe;
+    --bg-card: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 12px 40px rgba(0,0,0,0.15);
+  }
+
+  /* Toolbar moderno */
+  .modern-toolbar {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-md);
+    padding: 0 2rem;
+    height: 70px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .toolbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .dashboard-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .time-range-btn {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .time-range-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+  }
+
+  .dropdown-icon {
+    font-size: 20px;
+  }
+
+  /* Container principal */
+  .dashboard-container {
+    background: var(--bg-primary);
+    min-height: calc(100vh - 70px);
+    padding: 2rem;
+  }
+
+  /* Headers de sección */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .update-time {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  /* KPI Cards modernos */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .kpi-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--blue-gradient);
+  }
+
+  .kpi-card:nth-child(2)::before {
+    background: var(--purple-gradient);
+  }
+
+  .kpi-card:nth-child(3)::before {
+    background: var(--success-gradient);
+  }
+
+  .kpi-card:nth-child(4)::before {
+    background: var(--warning-gradient);
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--blue-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kpi-card:nth-child(2) .icon-wrapper {
+    background: var(--purple-gradient);
+  }
+
+  .kpi-card:nth-child(3) .icon-wrapper {
+    background: var(--success-gradient);
+  }
+
+  .kpi-card:nth-child(4) .icon-wrapper {
+    background: var(--warning-gradient);
+  }
+
+  .icon-wrapper mat-icon {
+    color: white;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #28c76f;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .trend-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .kpi-body {
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .kpi-footer {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .kpi-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  /* Animación de entrada */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-in {
+    animation: slideUp 0.6s ease forwards;
+  }
+
+  /* Grids de gráficos */
+  .charts-section {
+    margin-bottom: 3rem;
+  }
+
+  .charts-grid-two {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .charts-grid-single {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Cards de gráficos */
+  .chart-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .chart-card:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .chart-card.elevated {
+    border: 1px solid var(--border-color);
+  }
+
+  .chart-card mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 0;
+    margin-bottom: 1rem;
+  }
+
+  .card-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .title-icon {
+    color: #667eea;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .chart-card mat-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .card-menu {
+    color: var(--text-secondary);
+  }
+
+  .chart-card mat-card-content {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .chart-wrapper {
+    position: relative;
+    height: 300px;
+    margin-bottom: 1rem;
+  }
+
+  .chart-wrapper.doughnut {
+    height: 350px;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.blue {
+    background: #4facfe;
+  }
+
+  .legend-dot.purple {
+    background: #764ba2;
+  }
+
+  .legend-dot.orange {
+    background: #ff6a00;
+  }
+
+  /* Tablas modernas */
+  .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .table-card.alert {
+    border-left: 4px solid #ff6a00;
+  }
+
+  .table-card mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: linear-gradient(to bottom, #f8f9fe 0%, white 100%);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .title-icon.success {
+    color: #28c76f;
+  }
+
+  .title-icon.warning {
+    color: #ff6a00;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .alert-badge {
+    background: #fff4e6;
+    color: #ff6a00;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    width: 100%;
+    background: white;
+  }
+
+  .modern-table th {
+    background: #f8f9fe;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 1rem;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .header-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary);
+  }
+
+  .modern-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .table-row {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .table-row:hover {
+    background: #f8f9fe;
+  }
+
+  .sku-badge {
+    display: inline-block;
+    background: #e6f2ff;
+    color: #0066cc;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .sku-badge.warning {
+    background: #fff4e6;
+    color: #ff6a00;
+  }
+
+  .product-name {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .stock-value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .stock-value.success {
+    background: #e6f9f0;
+    color: #28c76f;
+  }
+
+  .stock-value.danger {
+    background: #ffe6e6;
+    color: #ff6b6b;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .charts-grid-two {
+      grid-template-columns: 1fr;
+    }
+    
+    .tables-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 1rem;
+    }
+
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .modern-toolbar {
+      padding: 0 1rem;
+    }
+
+    .title {
+      font-size: 1.25rem;
+    }
+  }
+</style>

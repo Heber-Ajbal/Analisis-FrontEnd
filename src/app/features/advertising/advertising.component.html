@@ -31,33 +31,35 @@
     </button>
   </mat-menu>
 
+  <!-- ---------------- SUMMARY CARDS ---------------- -->
   <div class="summary">
-    <mat-card class="summary-card" appearance="outlined">
+    <mat-card class="summary-card active" appearance="outlined">
       <div class="label">Campañas activas</div>
       <div class="value">{{ stats().active }}</div>
       <div class="helper">de {{ stats().totalCampaigns }} totales</div>
     </mat-card>
 
-    <mat-card class="summary-card" appearance="outlined">
-      <div class="label">Presupuesto invertido</div>
-      <div class="value">{{ stats().spent | currency:'MXN':'symbol-narrow' }}</div>
-      <mat-progress-bar mode="determinate" [value]="stats().spendRatio"></mat-progress-bar>
-      <div class="helper">{{ stats().spendRatio | number:'1.0-1' }}% del presupuesto asignado</div>
-    </mat-card>
+    <mat-card class="summary-card spent" appearance="outlined">
+  <div class="label">Presupuesto invertido</div>
+  <div class="value">{{ stats().spent | currency:'MXN':'symbol-narrow' }}</div>
+  <!-- <mat-progress-bar mode="determinate" [value]="stats().spendRatio"></mat-progress-bar> -->
+  <div class="helper">{{ stats().spendRatio | number:'1.0-1' }}% del presupuesto asignado</div>
+</mat-card>
 
-    <mat-card class="summary-card" appearance="outlined">
+    <mat-card class="summary-card ctr" appearance="outlined">
       <div class="label">CTR promedio</div>
       <div class="value">{{ stats().ctr | number:'1.1-2' }}%</div>
       <div class="helper">{{ stats().clicks | number }} clics / {{ stats().impressions | number }} impresiones</div>
     </mat-card>
 
-    <mat-card class="summary-card" appearance="outlined">
+    <mat-card class="summary-card conversions" appearance="outlined">
       <div class="label">Conversiones</div>
       <div class="value">{{ stats().conversions | number }}</div>
       <div class="helper">Tasa de conversión {{ stats().cvr | number:'1.1-2' }}%</div>
     </mat-card>
   </div>
 
+  <!-- ---------------- CONTENT ---------------- -->
   <div class="content">
     <section class="panel">
       <div class="panel-header">
@@ -84,19 +86,19 @@
           </div>
 
           <div class="metrics">
-            <div>
+            <div class="impressions">
               <span class="label">Impresiones</span>
               <span class="value">{{ campaign.impressions | number }}</span>
             </div>
-            <div>
+            <div class="clicks">
               <span class="label">Clics</span>
               <span class="value">{{ campaign.clicks | number }}</span>
             </div>
-            <div>
+            <div class="conversions">
               <span class="label">Conversiones</span>
               <span class="value">{{ campaign.conversions | number }}</span>
             </div>
-            <div>
+            <div class="spent">
               <span class="label">Gasto</span>
               <span class="value">{{ campaign.spent | currency:'MXN':'symbol-narrow' }}</span>
             </div>

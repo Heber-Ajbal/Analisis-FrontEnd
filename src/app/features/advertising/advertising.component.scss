@@ -1,6 +1,8 @@
 :host {
   display: block;
   min-height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background: #f4f6fb;
 }
 
 .page {
@@ -10,117 +12,159 @@
   padding: 24px;
 }
 
+/* ------------------- TOOLBAR ------------------- */
 .toolbar {
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px 24px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.18);
-}
-
-.toolbar-main {
-  display: flex;
   align-items: center;
-  gap: 16px;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
 }
 
-.title {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.toolbar:hover {
+  box-shadow: 0 16px 36px rgba(0,0,0,0.2);
 }
 
-.title mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
+.toolbar-main .title mat-icon {
+  font-size: 50px;
+  width: 50px;
+  height: 50px;
 }
 
 .heading h1 {
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .heading .subtitle {
-  margin: 4px 0 0;
-  opacity: 0.85;
+  margin-top: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* ------------------- SUMMARY CARDS ------------------- */
 .summary {
   display: grid;
-  gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
 }
 
 .summary-card {
-  padding: 20px;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  position: relative;
+  padding: 24px;
+  border-radius: 20px;
+  color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.summary-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.2);
+}
+
+/* Gradientes por tipo */
+.summary-card.active { background: linear-gradient(135deg, #42a5f5, #1e88e5); }
+.summary-card.spent { background: linear-gradient(135deg, #ffca28, #ffa000); }
+.summary-card.ctr { background: linear-gradient(135deg, #66bb6a, #388e3c); }
+.summary-card.conversions { background: linear-gradient(135deg, #ef5350, #c62828); }
+
+/* Iconos de fondo (opcional, si agregas imágenes en /assets/icons/) */
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 80px;
+  height: 80px;
+  opacity: 0.2;
+  background-size: cover;
+}
+
+.summary-card.active::before { background-image: url('/assets/icons/campaign.svg'); }
+.summary-card.spent::before { background-image: url('/assets/icons/money.svg'); }
+.summary-card.ctr::before { background-image: url('/assets/icons/click.svg'); }
+.summary-card.conversions::before { background-image: url('/assets/icons/conversion.svg'); }
+
+/* Labels y valores */
 .summary-card .label {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: rgba(0, 0, 0, 0.54);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .summary-card .value {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .summary-card .helper {
-  color: rgba(0, 0, 0, 0.6);
   font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-.content {
-  display: grid;
-  gap: 24px;
+/* Destacar Presupuesto invertido */
+.summary-card.spent .value {
+  font-size: 36px;
+  font-weight: 900;
 }
 
+/* ------------------- PANELS ------------------- */
 .panel {
   background: #fff;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 32px rgba(15,23,42,0.08);
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.panel-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1976d2;
 }
 
+/* ------------------- CAMPAIGN CARDS ------------------- */
+/* ------------------- CAMPANAS EN CURSO ------------------- */
 .campaign-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .campaign-card {
-  border-radius: 16px;
+  position: relative;
+  border-radius: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px;
+  transition: all 0.3s ease;
 }
 
+.campaign-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.15);
+}
+
+/* HEADER CARD */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -129,27 +173,28 @@
 
 .card-header .title {
   display: flex;
+  align-items: center;
   gap: 12px;
-  align-items: flex-start;
 }
 
 .card-header .title mat-icon {
   font-size: 36px;
-  width: 36px;
-  height: 36px;
+  color: #1976d2;
 }
 
 .card-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
+  color: #000;
 }
 
 .card-header .meta {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.54);
+  color: rgba(0,0,0,0.6);
 }
 
+/* STATUS */
 .status {
   padding: 4px 12px;
   border-radius: 999px;
@@ -157,54 +202,77 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
+  color: #fff;
 }
 
-.status.small {
-  font-size: 11px;
-  padding: 3px 8px;
-}
+.status.active { background-color: #42a5f5; }
+.status.paused { background-color: #ffa000; }
+.status.ended { background-color: #ef5350; }
 
+/* METRICS */
 .metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
+.metrics div {
+  display: flex;
+  flex-direction: column;
+}
+
 .metrics .label {
-  display: block;
   font-size: 12px;
+  color: rgba(0,0,0,0.54);
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.54);
+  font-weight: 600;
 }
 
 .metrics .value {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #000;
 }
 
+/* ACTION BUTTONS */
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
-.campaign-list {
-  padding: 0;
+.actions button {
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
+.actions button:hover {
+  transform: scale(1.05);
+}
+
+
+/* ------------------- CAMPAIGN LIST ------------------- */
 .campaign-list mat-list-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.campaign-list mat-list-item:last-child {
-  border-bottom: none;
+.campaign-list mat-list-item:last-child { border-bottom: none; }
+
+.campaign-list mat-list-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
 }
 
 .campaign-list .secondary {
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0,0,0,0.65);
 }
 
+/* ------------------- EMPTY STATE ------------------- */
 .empty {
   margin: 24px auto;
   padding: 32px;
@@ -212,41 +280,16 @@
   display: grid;
   gap: 16px;
   max-width: 360px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.1);
 }
 
-.empty mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  margin: 0 auto;
-  color: rgba(25, 118, 210, 0.8);
-}
+.empty mat-icon { font-size: 48px; color: #1976d2; }
+.empty h3 { font-weight: 700; color: #1976d2; }
+.empty p { color: #555; }
 
-.chip-muted {
-  background: rgba(0, 0, 0, 0.08);
-  color: rgba(0, 0, 0, 0.65);
-}
-
-.chip-info {
-  background: rgba(33, 150, 243, 0.15);
-  color: #1565c0;
-}
-
-.chip-success {
-  background: rgba(46, 125, 50, 0.15);
-  color: #1b5e20;
-}
-
-.chip-warning {
-  background: rgba(255, 152, 0, 0.18);
-  color: #e65100;
-}
-
-.chip-neutral {
-  background: rgba(120, 144, 156, 0.16);
-  color: #37474f;
-}
-
+/* ------------------- RESPONSIVE ------------------- */
 @media (max-width: 768px) {
   .toolbar {
     flex-direction: column;
