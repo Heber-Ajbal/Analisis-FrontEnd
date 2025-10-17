@@ -1,0 +1,79 @@
+.user-toolbar {
+  margin-bottom: 1rem;
+
+  .title {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+mat-card {
+  padding: 1rem;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  .search {
+    flex: 1 1 280px;
+  }
+
+  .results {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.9rem;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  th {
+    font-weight: 600;
+  }
+
+  td,
+  th {
+    padding: 0.75rem;
+  }
+}
+
+.status-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timestamps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.empty-state,
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 2rem 0;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+}
