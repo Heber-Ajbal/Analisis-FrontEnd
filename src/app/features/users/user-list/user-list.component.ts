@@ -39,7 +39,7 @@ import { User } from '../../../models/users/user.model';
 export class UserListComponent implements OnInit {
   private readonly usersService = inject(UsersService);
 
-  readonly displayedColumns = ['username', 'email', 'fullName', 'provider', 'status', 'timestamps'];
+  readonly displayedColumns = ['username', 'email', 'fullName', 'provider', 'timestamps'];
 
   readonly users = signal<User[]>([]);
   readonly loading = signal(false);

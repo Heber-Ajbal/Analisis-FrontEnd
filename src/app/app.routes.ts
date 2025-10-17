@@ -55,7 +55,7 @@ export const routes: Routes = [
         path: 'usuarios',
         loadChildren: () =>
           import('./features/users/users.module').then((m) => m.UsersModule),
-        canActivate: [adminGuard],
+        //canActivate: [adminGuard],
       },
       { path: 'compras', component: PurchaseManagementComponent /*, canActivate: [adminGuard]*/ },
     ]
