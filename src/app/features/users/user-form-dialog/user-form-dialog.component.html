@@ -1,0 +1,84 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar usuario' : 'Crear usuario' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" class="user-form">
+  <mat-dialog-content>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="username" autocomplete="off" />
+        <mat-error *ngIf="form.get('username')?.hasError('required')">
+          El usuario es obligatorio
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Correo electrónico</mat-label>
+        <input matInput formControlName="email" autocomplete="off" />
+        <mat-error *ngIf="form.get('email')?.hasError('required')">
+          El correo es obligatorio
+        </mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">
+          Ingresa un correo válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="!isEditMode">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" formControlName="password" />
+        <mat-error *ngIf="form.get('password')?.hasError('required')">
+          La contraseña es obligatoria
+        </mat-error>
+        <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+          Debe tener al menos 6 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="isEditMode">
+        <mat-label>Nueva contraseña (opcional)</mat-label>
+        <input matInput type="password" formControlName="password" />
+        <mat-hint>Déjala vacía para mantener la actual</mat-hint>
+        <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+          Debe tener al menos 6 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="firstName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="lastName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Rol</mat-label>
+        <input matInput formControlName="role" placeholder="ID de rol" />
+      </mat-form-field>
+    </div>
+
+    <div class="toggles">
+      <mat-checkbox formControlName="confirmed">Confirmado</mat-checkbox>
+      <mat-checkbox formControlName="blocked">Bloqueado</mat-checkbox>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()" [disabled]="loading()">Cancelar</button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="loading() || form.invalid"
+    >
+      <mat-icon *ngIf="!loading()">save</mat-icon>
+      <span *ngIf="!loading()">Guardar</span>
+      <mat-progress-spinner
+        *ngIf="loading()"
+        diameter="20"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    </button>
+  </mat-dialog-actions>
+</form>

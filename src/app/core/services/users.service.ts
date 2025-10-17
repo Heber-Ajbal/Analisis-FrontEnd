@@ -3,7 +3,27 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { mapUserApiToUser, User, UserApi } from '../../models/users/user.model';
+import {
+  mapUserApiToUser,
+  User,
+  UserApi,
+} from '../../models/users/user.model';
+
+export interface CreateUserPayload {
+  username: string;
+  email: string;
+  password: string;
+  provider?: string;
+  confirmed?: boolean;
+  blocked?: boolean;
+  firstName?: string | null;
+  lastName?: string | null;
+  role?: string | number | null;
+}
+
+export type UpdateUserPayload = Partial<Omit<CreateUserPayload, 'password'>> & {
+  password?: string;
+};
 
 interface UsersResponse {
   data?: UserApi[];
@@ -30,5 +50,21 @@ export class UsersService {
 
     const items = Array.isArray(res) ? res : res.data ?? [];
     return items.map(mapUserApiToUser);
+  }
+
+  async create(payload: CreateUserPayload): Promise<User> {
+    const res = await firstValueFrom(
+      this.http.post<UserApi>(`${this.API}/users`, payload)
+    );
+
+    return mapUserApiToUser(res);
+  }
+
+  async update(id: number, payload: UpdateUserPayload): Promise<User> {
+    const res = await firstValueFrom(
+      this.http.put<UserApi>(`${this.API}/users/${id}`, payload)
+    );
+
+    return mapUserApiToUser(res);
   }
 }

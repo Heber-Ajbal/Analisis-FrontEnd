@@ -12,9 +12,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 
 import { UsersService } from '../../../core/services/users.service';
 import { User } from '../../../models/users/user.model';
+import { UserFormDialogComponent } from '../user-form-dialog/user-form-dialog.component';
 
 @Component({
   selector: 'app-user-list',
@@ -32,14 +35,23 @@ import { User } from '../../../models/users/user.model';
     MatProgressBarModule,
     MatChipsModule,
     MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
 })
 export class UserListComponent implements OnInit {
   private readonly usersService = inject(UsersService);
+  private readonly dialog = inject(MatDialog);
 
-  readonly displayedColumns = ['username', 'email', 'fullName', 'provider', 'timestamps'];
+  readonly displayedColumns = [
+    'username',
+    'email',
+    'fullName',
+    'provider',
+    'timestamps',
+    'actions',
+  ];
 
   readonly users = signal<User[]>([]);
   readonly loading = signal(false);
@@ -77,6 +89,46 @@ export class UserListComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async openCreateDialog(): Promise<void> {
+    const dialogRef = this.dialog.open(UserFormDialogComponent, {
+      width: '520px',
+      disableClose: true,
+      data: null,
+    });
+
+    const result = await firstValueFrom(dialogRef.afterClosed());
+    if (result) {
+      this.upsertUser(result);
+    }
+  }
+
+  async openEditDialog(user: User): Promise<void> {
+    const dialogRef = this.dialog.open(UserFormDialogComponent, {
+      width: '520px',
+      disableClose: true,
+      data: user,
+    });
+
+    const result = await firstValueFrom(dialogRef.afterClosed());
+    if (result) {
+      this.upsertUser(result);
+    }
+  }
+
+  private upsertUser(user: User): void {
+    const current = this.users();
+    const index = current.findIndex((item) => item.id === user.id);
+    const updated = [...current];
+
+    if (index >= 0) {
+      updated[index] = user;
+    } else {
+      updated.unshift(user);
+    }
+
+    this.users.set(updated);
   }
 
   onQueryChange(value: string): void {
