@@ -1,0 +1,28 @@
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.toggles {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+mat-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+button[mat-flat-button] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

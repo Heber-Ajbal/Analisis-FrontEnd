@@ -9,6 +9,13 @@
   .spacer {
     flex: 1 1 auto;
   }
+
+  button[mat-flat-button] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 0.5rem;
+  }
 }
 
 mat-card {
@@ -47,6 +54,15 @@ table {
   th {
     padding: 0.75rem;
   }
+}
+
+.actions-header {
+  width: 56px;
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .status-cell {
