@@ -51,6 +51,12 @@ export const routes: Routes = [
           import('./features/advertising/advertising.module').then((m) => m.AdvertisingModule),
         // canActivate: [adminGuard],
       },
+      {
+        path: 'usuarios',
+        loadChildren: () =>
+          import('./features/users/users.module').then((m) => m.UsersModule),
+        canActivate: [adminGuard],
+      },
       { path: 'compras', component: PurchaseManagementComponent /*, canActivate: [adminGuard]*/ },
     ]
   }
