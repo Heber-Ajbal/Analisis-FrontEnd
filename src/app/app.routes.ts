@@ -12,7 +12,6 @@ import { CartComponent } from './features/cart/cart.component';
 
 //ADMIN
 import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { InventoryListComponent } from './features/inventory/inventory-list/inventory-list.component';
 import { PurchaseManagementComponent } from './features/purchases/purchase-management.component';
 
 // Guards
@@ -40,7 +39,18 @@ export const routes: Routes = [
       { path: 'carrito', component: CartComponent },
 
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'inventario', component: InventoryListComponent /*, canActivate: [adminGuard]*/ },
+      {
+        path: 'inventario',
+        loadChildren: () =>
+          import('./features/inventory/inventory.module').then((m) => m.InventoryModule),
+        // canActivate: [adminGuard],
+      },
+      {
+        path: 'publicidad',
+        loadChildren: () =>
+          import('./features/advertising/advertising.module').then((m) => m.AdvertisingModule),
+        // canActivate: [adminGuard],
+      },
       { path: 'compras', component: PurchaseManagementComponent /*, canActivate: [adminGuard]*/ },
     ]
   }

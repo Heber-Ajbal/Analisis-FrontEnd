@@ -1,0 +1,154 @@
+<div class="page">
+  <mat-toolbar color="primary" class="toolbar">
+    <div class="toolbar-main">
+      <div class="title">
+        <mat-icon>campaign</mat-icon>
+        <div class="heading">
+          <h1>Publicidad y campañas</h1>
+          <p class="subtitle">Monitorea el rendimiento de tus campañas activas y planificadas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <button mat-stroked-button color="primary">
+        <mat-icon>add</mat-icon>
+        Nueva campaña
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Más acciones">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>
+      <mat-icon>file_download</mat-icon>
+      <span>Exportar reporte</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>notifications_active</mat-icon>
+      <span>Configurar alertas</span>
+    </button>
+  </mat-menu>
+
+  <div class="summary">
+    <mat-card class="summary-card" appearance="outlined">
+      <div class="label">Campañas activas</div>
+      <div class="value">{{ stats().active }}</div>
+      <div class="helper">de {{ stats().totalCampaigns }} totales</div>
+    </mat-card>
+
+    <mat-card class="summary-card" appearance="outlined">
+      <div class="label">Presupuesto invertido</div>
+      <div class="value">{{ stats().spent | currency:'MXN':'symbol-narrow' }}</div>
+      <mat-progress-bar mode="determinate" [value]="stats().spendRatio"></mat-progress-bar>
+      <div class="helper">{{ stats().spendRatio | number:'1.0-1' }}% del presupuesto asignado</div>
+    </mat-card>
+
+    <mat-card class="summary-card" appearance="outlined">
+      <div class="label">CTR promedio</div>
+      <div class="value">{{ stats().ctr | number:'1.1-2' }}%</div>
+      <div class="helper">{{ stats().clicks | number }} clics / {{ stats().impressions | number }} impresiones</div>
+    </mat-card>
+
+    <mat-card class="summary-card" appearance="outlined">
+      <div class="label">Conversiones</div>
+      <div class="value">{{ stats().conversions | number }}</div>
+      <div class="helper">Tasa de conversión {{ stats().cvr | number:'1.1-2' }}%</div>
+    </mat-card>
+  </div>
+
+  <div class="content">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Campañas en curso</h2>
+        <button mat-button color="primary">
+          <mat-icon>insights</mat-icon>
+          Ver analíticas detalladas
+        </button>
+      </div>
+
+      <div class="campaign-grid" *ngIf="runningCampaigns().length; else empty">
+        <mat-card *ngFor="let campaign of runningCampaigns()" appearance="outlined" class="campaign-card">
+          <div class="card-header">
+            <div class="title">
+              <mat-icon>{{ channelIcon(campaign.channel) }}</mat-icon>
+              <div>
+                <h3>{{ campaign.name }}</h3>
+                <span class="meta">Desde {{ campaign.startDate | date:'d MMM y' }}</span>
+              </div>
+            </div>
+            <span class="status" [class]="statusClass(campaign.status)">
+              {{ statusLabel(campaign.status) }}
+            </span>
+          </div>
+
+          <div class="metrics">
+            <div>
+              <span class="label">Impresiones</span>
+              <span class="value">{{ campaign.impressions | number }}</span>
+            </div>
+            <div>
+              <span class="label">Clics</span>
+              <span class="value">{{ campaign.clicks | number }}</span>
+            </div>
+            <div>
+              <span class="label">Conversiones</span>
+              <span class="value">{{ campaign.conversions | number }}</span>
+            </div>
+            <div>
+              <span class="label">Gasto</span>
+              <span class="value">{{ campaign.spent | currency:'MXN':'symbol-narrow' }}</span>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="actions">
+            <button mat-button>Editar</button>
+            <button mat-button>Duplicar</button>
+            <button mat-button color="warn">Pausar</button>
+          </div>
+        </mat-card>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Campañas planificadas y recientes</h2>
+      </div>
+
+      <mat-list class="campaign-list">
+        <mat-list-item *ngFor="let campaign of otherCampaigns()">
+          <mat-icon matListItemIcon>{{ channelIcon(campaign.channel) }}</mat-icon>
+          <div matListItemTitle>
+            {{ campaign.name }}
+            <span class="status small" [class]="statusClass(campaign.status)">
+              {{ statusLabel(campaign.status) }}
+            </span>
+          </div>
+          <div matListItemLine class="secondary">
+            Presupuesto {{ campaign.budget | currency:'MXN':'symbol-narrow' }} · Inicio {{ campaign.startDate | date:'mediumDate' }}
+            <ng-container *ngIf="campaign.endDate">
+              · Fin {{ campaign.endDate | date:'mediumDate' }}
+            </ng-container>
+          </div>
+          <div matListItemMeta>
+            <button mat-icon-button aria-label="Ver detalles">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </section>
+  </div>
+</div>
+
+<ng-template #empty>
+  <mat-card class="empty" appearance="outlined">
+    <mat-icon>schedule</mat-icon>
+    <h3>No hay campañas activas</h3>
+    <p>Planifica una nueva campaña o reactiva una existente para comenzar a medir resultados.</p>
+    <button mat-raised-button color="primary">Crear campaña</button>
+  </mat-card>
+</ng-template>
