@@ -17,12 +17,12 @@
       </mat-form-field>
 
       <div class="flex flex-col gap-1">
-        <re-captcha
+        <app-recaptcha
           #captchaRef
           formControlName="captcha"
           [siteKey]="siteKey"
           theme="light"
-        ></re-captcha>
+        ></app-recaptcha>
         <mat-error *ngIf="form.get('captcha')?.hasError('required') && form.get('captcha')?.touched">
           Confirma que no eres un robot
         </mat-error>

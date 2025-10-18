@@ -8,8 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
-import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
+import { RecaptchaComponent } from '../../../shared/recaptcha/recaptcha.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -27,8 +26,7 @@ import { environment } from '../../../../environments/environment';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     RouterLink,
-    RecaptchaModule,
-    RecaptchaFormsModule
+    RecaptchaComponent
   ],
   templateUrl:'./login.component.html',
   styleUrls: ['./login.component.scss']
@@ -56,24 +54,24 @@ export class LoginComponent {
     } );
   }
 
-async submit() {
-  if (this.loading) return;
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
-  }
-  this.loading = true;
-  const { email, pass, captcha } = this.form.value as { email: string; pass: string; captcha: string };
+  async submit() {
+    if (this.loading) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.loading = true;
+    const { email, pass, captcha } = this.form.value as { email: string; pass: string; captcha: string };
 
-  try {
-    await this.auth.login(email, pass, captcha);   // guarda el JWT
-    this.router.navigateByUrl('/dashboard');   // navega a donde quieras
-  } catch (e: any) {
-    this.snack.open(e?.error?.message ?? e?.message ?? 'Credenciales inválidas', 'Cerrar', { duration: 3000 });
-  } finally {
-    this.loading = false;
-    this.form.get('captcha')?.reset();
-    this.captchaRef?.reset();
+    try {
+      await this.auth.login(email, pass, captcha); // guarda el JWT
+      this.router.navigateByUrl('/dashboard'); // navega a donde quieras
+    } catch (e: any) {
+      this.snack.open(e?.error?.message ?? e?.message ?? 'Credenciales inválidas', 'Cerrar', { duration: 3000 });
+    } finally {
+      this.loading = false;
+      this.form.get('captcha')?.reset();
+      this.captchaRef?.reset();
+    }
   }
-}
 }

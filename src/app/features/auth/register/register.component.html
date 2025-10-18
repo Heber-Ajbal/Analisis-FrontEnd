@@ -58,12 +58,12 @@
           <!-- Acciones: botón ancho completo + mensaje debajo -->
           <div class="mt-2">
             <div class="flex flex-col gap-1 mb-2">
-              <re-captcha
+              <app-recaptcha
                 #clienteCaptchaRef
                 formControlName="captcha"
                 [siteKey]="siteKey"
                 theme="light"
-              ></re-captcha>
+              ></app-recaptcha>
               <mat-error *ngIf="clienteForm.get('captcha')?.hasError('required') && clienteForm.get('captcha')?.touched">
                 Confirma que no eres un robot
               </mat-error>
@@ -176,12 +176,12 @@
 
           <div class="mt-2">
             <div class="flex flex-col gap-1 mb-2">
-              <re-captcha
+              <app-recaptcha
                 #empresaCaptchaRef
                 formControlName="captcha"
                 [siteKey]="siteKey"
                 theme="light"
-              ></re-captcha>
+              ></app-recaptcha>
               <mat-error *ngIf="empresaForm.get('captcha')?.hasError('required') && empresaForm.get('captcha')?.touched">
                 Confirma que no eres un robot
               </mat-error>
