@@ -57,6 +57,17 @@
 
           <!-- Acciones: botón ancho completo + mensaje debajo -->
           <div class="mt-2">
+            <div class="flex flex-col gap-1 mb-2">
+              <re-captcha
+                #clienteCaptchaRef
+                formControlName="captcha"
+                [siteKey]="siteKey"
+                theme="light"
+              ></re-captcha>
+              <mat-error *ngIf="clienteForm.get('captcha')?.hasError('required') && clienteForm.get('captcha')?.touched">
+                Confirma que no eres un robot
+              </mat-error>
+            </div>
             <button mat-flat-button color="primary" type="submit"
                     class="w-full h-11 justify-center"
                     [disabled]="clienteForm.invalid || loading">
@@ -164,6 +175,17 @@
           </div>
 
           <div class="mt-2">
+            <div class="flex flex-col gap-1 mb-2">
+              <re-captcha
+                #empresaCaptchaRef
+                formControlName="captcha"
+                [siteKey]="siteKey"
+                theme="light"
+              ></re-captcha>
+              <mat-error *ngIf="empresaForm.get('captcha')?.hasError('required') && empresaForm.get('captcha')?.touched">
+                Confirma que no eres un robot
+              </mat-error>
+            </div>
             <button mat-stroked-button color="primary" type="submit"
                     class="w-full h-11 justify-center"
                     [disabled]="empresaForm.invalid || loading">

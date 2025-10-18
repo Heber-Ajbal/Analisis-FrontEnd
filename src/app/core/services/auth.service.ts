@@ -8,7 +8,7 @@ export type Role = 'cliente' | 'admin_empresa';
 export type Tipo = 'cliente' | 'empresa';
 export interface User { email:string; role:Role; type:Tipo; approved?:boolean; }
 
-type LoginPayload = { identifier: string; password: string };
+type LoginPayload = { identifier: string; password: string; captchaToken?: string };
 type LoginResponse = { jwt: string; user: any };             // lo que muestra tu captura
 type MeResponse = {
   id: number;
@@ -37,8 +37,9 @@ export class AuthService {
   isLoggedIn() { return !!this.token; }
   logout()     { this.token = null; }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(email: string, password: string, captchaToken?: string): Promise<void> {
     const body: LoginPayload = { identifier: email, password };
+    if (captchaToken) body.captchaToken = captchaToken;
     const res = await firstValueFrom(
       this.http.post<LoginResponse>(`${this.API}/auth/new-local`, body)
     );

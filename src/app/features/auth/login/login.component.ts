@@ -1,4 +1,4 @@
-import { Component,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -23,7 +25,8 @@ import { AuthService } from '../../../core/services/auth.service';
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
+    RecaptchaModule
   ],
   templateUrl:'./login.component.html',
   styleUrls: ['./login.component.scss']
@@ -31,6 +34,9 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   hide = true;
   loading = false;
+  readonly siteKey = environment.recaptchaSiteKey;
+
+  @ViewChild('captchaRef') captchaRef?: RecaptchaComponent;
 
   // Declaramos la propiedad y la inicializamos en el constructor
   form!: FormGroup;
@@ -44,21 +50,28 @@ export class LoginComponent {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       pass:  ['', [Validators.required]],
+      captcha: ['', [Validators.required]]
     } );
   }
 
 async submit() {
-  if (this.form.invalid || this.loading) return;
+  if (this.loading) return;
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
   this.loading = true;
-  const { email, pass } = this.form.value as { email: string; pass: string };
+  const { email, pass, captcha } = this.form.value as { email: string; pass: string; captcha: string };
 
   try {
-    await this.auth.login(email, pass);   // guarda el JWT
+    await this.auth.login(email, pass, captcha);   // guarda el JWT
     this.router.navigateByUrl('/dashboard');   // navega a donde quieras
   } catch (e: any) {
     this.snack.open(e?.error?.message ?? e?.message ?? 'Credenciales inválidas', 'Cerrar', { duration: 3000 });
   } finally {
     this.loading = false;
+    this.form.get('captcha')?.reset();
+    this.captchaRef?.reset();
   }
 }
 }
