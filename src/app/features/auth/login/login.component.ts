@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
+import { RecaptchaFormsModule } from 'ng-recaptcha/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -26,7 +27,8 @@ import { environment } from '../../../../environments/environment';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     RouterLink,
-    RecaptchaModule
+    RecaptchaModule,
+    RecaptchaFormsModule
   ],
   templateUrl:'./login.component.html',
   styleUrls: ['./login.component.scss']
