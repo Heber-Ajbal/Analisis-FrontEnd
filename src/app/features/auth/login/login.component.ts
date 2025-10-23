@@ -9,8 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecaptchaComponent } from '../../../shared/recaptcha/recaptcha.component';
+import { resolveRecaptchaSiteKey } from '../../../shared/recaptcha/site-key-resolver';
 import { AuthService } from '../../../core/services/auth.service';
-import { environment } from '../../../../environments/environment';
 
 @Component({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -34,7 +34,7 @@ import { environment } from '../../../../environments/environment';
 export class LoginComponent {
   hide = true;
   loading = false;
-  readonly siteKey = environment.recaptchaSiteKey;
+  readonly siteKey = resolveRecaptchaSiteKey();
 
   @ViewChild('captchaRef') captchaRef?: RecaptchaComponent;
 

@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RecaptchaComponent } from '../../../shared/recaptcha/recaptcha.component';
-import { environment } from '../../../../environments/environment';
+import { resolveRecaptchaSiteKey } from '../../../shared/recaptcha/site-key-resolver';
 
 
 @Component({
@@ -31,7 +31,7 @@ export class RegisterComponent {
   hide2 = true;
   loading = false;
   tabIndex = 0;
-  readonly siteKey = environment.recaptchaSiteKey;
+  readonly siteKey = resolveRecaptchaSiteKey();
 
   @ViewChild('clienteCaptchaRef') clienteCaptcha?: RecaptchaComponent;
   @ViewChild('empresaCaptchaRef') empresaCaptcha?: RecaptchaComponent;
