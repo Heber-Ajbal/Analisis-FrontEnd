@@ -1,4 +1,4 @@
-import { Component,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RecaptchaComponent } from '../../../shared/recaptcha/recaptcha.component';
+import { resolveRecaptchaSiteKey } from '../../../shared/recaptcha/site-key-resolver';
 
 
 @Component({
@@ -18,7 +20,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   imports: [
     CommonModule, RouterLink, ReactiveFormsModule,
     MatTabsModule, MatFormFieldModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule
+    MatButtonModule, MatIconModule, MatSnackBarModule, MatProgressSpinnerModule,
+    RecaptchaComponent
   ],
    templateUrl:'./register.component.html',
    styleUrls: ['./register.component.scss']
@@ -28,6 +31,10 @@ export class RegisterComponent {
   hide2 = true;
   loading = false;
   tabIndex = 0;
+  readonly siteKey = resolveRecaptchaSiteKey();
+
+  @ViewChild('clienteCaptchaRef') clienteCaptcha?: RecaptchaComponent;
+  @ViewChild('empresaCaptchaRef') empresaCaptcha?: RecaptchaComponent;
 
   clienteForm!: FormGroup;
   empresaForm!: FormGroup;
@@ -38,6 +45,7 @@ export class RegisterComponent {
       phone: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       pass:  ['', [Validators.required, Validators.minLength(6)]],
+      captcha: ['', Validators.required]
     });
 
     this.empresaForm = this.fb.group({
@@ -47,26 +55,37 @@ export class RegisterComponent {
       dpi:       ['', Validators.required],
       email:     ['', [Validators.required, Validators.email]],
       pass:      ['', [Validators.required, Validators.minLength(6)]],
+      captcha:   ['', Validators.required]
     });
   }
 
   registrarCliente() {
-    if (this.clienteForm.invalid) return;
+    if (this.clienteForm.invalid) {
+      this.clienteForm.markAllAsTouched();
+      return;
+    }
     this.loading = true;
     setTimeout(() => {
       this.loading = false;
       this.snack.open('Cliente registrado (front). Continúa con login.', 'OK', { duration: 2200 });
       this.router.navigateByUrl('/login');
+      this.clienteForm.reset();
+      this.clienteCaptcha?.reset();
     }, 800);
   }
 
   registrarEmpresa() {
-    if (this.empresaForm.invalid) return;
+    if (this.empresaForm.invalid) {
+      this.empresaForm.markAllAsTouched();
+      return;
+    }
     this.loading = true;
     setTimeout(() => {
       this.loading = false;
       this.snack.open('Empresa enviada a revisión (front).', 'OK', { duration: 2200 });
       this.router.navigateByUrl('/revision');
+      this.empresaForm.reset();
+      this.empresaCaptcha?.reset();
     }, 800);
   }
 }

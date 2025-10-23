@@ -12,9 +12,23 @@
 
       <mat-form-field appearance="fill">
         <mat-label>Contraseña</mat-label>
-        <input matInput [type]="hide ? 'password' : 'text'" formControlName="pass" placeholder="••••••" />  
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="pass" placeholder="••••••" />
         <mat-error *ngIf="form.get('pass')?.hasError('required')">La contraseña es obligatoria</mat-error>
       </mat-form-field>
+
+      <div class="flex flex-col gap-1">
+        <app-recaptcha
+          #captchaRef
+          formControlName="captcha"
+          [siteKey]="siteKey"
+          challengeType="image"
+          [forceChallenge]="true"
+          theme="light"
+        ></app-recaptcha>
+        <mat-error *ngIf="form.get('captcha')?.hasError('required') && form.get('captcha')?.touched">
+          Confirma que no eres un robot
+        </mat-error>
+      </div>
       <p class="mb-6 text-muted text-right"> <a class="link">¿Olvidaste tu contraseña?</a></p>
 
       <button mat-flat-button color="primary" class="mt-1" [disabled]="form.invalid || loading">
