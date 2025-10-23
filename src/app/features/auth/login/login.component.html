@@ -21,6 +21,8 @@
           #captchaRef
           formControlName="captcha"
           [siteKey]="siteKey"
+          challengeType="image"
+          [forceChallenge]="true"
           theme="light"
         ></app-recaptcha>
         <mat-error *ngIf="form.get('captcha')?.hasError('required') && form.get('captcha')?.touched">

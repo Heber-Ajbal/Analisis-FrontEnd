@@ -45,6 +45,8 @@ export class RecaptchaComponent implements ControlValueAccessor, AfterViewInit, 
   @Input({ required: true }) siteKey!: string;
   @Input() theme: 'light' | 'dark' = 'light';
   @Input() size: 'normal' | 'compact' = 'normal';
+  @Input() challengeType: 'image' | 'audio' = 'image';
+  @Input() forceChallenge = false;
   @Output() resolved = new EventEmitter<string>();
   @Output() expired = new EventEmitter<void>();
   @ViewChild('container', { static: true }) private container!: ElementRef<HTMLDivElement>;
@@ -104,6 +106,13 @@ export class RecaptchaComponent implements ControlValueAccessor, AfterViewInit, 
     }
     if (this.widgetId !== null && window.grecaptcha?.reset) {
       window.grecaptcha.reset(this.widgetId);
+      if (this.forceChallenge) {
+        try {
+          window.grecaptcha.execute(this.widgetId);
+        } catch (error) {
+          console.warn('reCAPTCHA execute failed', error);
+        }
+      }
     }
   }
 
@@ -176,6 +185,7 @@ export class RecaptchaComponent implements ControlValueAccessor, AfterViewInit, 
       sitekey: this.siteKey,
       theme: this.theme,
       size: this.size,
+      type: this.challengeType,
       callback: (token: string) => {
         this.value = token;
         this.onChange(token);
@@ -192,5 +202,13 @@ export class RecaptchaComponent implements ControlValueAccessor, AfterViewInit, 
         this.onChange(null);
       },
     });
+
+    if (this.forceChallenge) {
+      try {
+        grecaptcha.execute(this.widgetId);
+      } catch (error) {
+        console.warn('reCAPTCHA execute failed', error);
+      }
+    }
   }
 }
