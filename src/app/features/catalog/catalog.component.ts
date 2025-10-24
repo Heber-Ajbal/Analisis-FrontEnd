@@ -96,6 +96,8 @@ export class CatalogComponent implements OnInit {
   maxBrandsCollapsed = 12;
   showAllBrands = false;
 
+  private fallbackStockMap = new Map<string, number>();
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -180,7 +182,7 @@ export class CatalogComponent implements OnInit {
     const description = product.description || 'Sin descripción disponible.';
     const price = Number.isFinite(product.precio) ? Number(product.precio) : 0;
     const stock = product.stock && product.stock > 0 ? product.stock : this.getFallbackStock(id);
-    const inStock = product.estado !== 'inactivo';
+    const inStock = (product.estado ?? 'activo') !== 'inactivo' && stock > 0;
     const image = product.imagenUrl || this.getPlaceholderImage(id);
 
     return {
@@ -206,12 +208,25 @@ export class CatalogComponent implements OnInit {
   }
 
   private getFallbackStock(seed: string): number {
-    let hash = 5381;
-    for (let i = 0; i < seed.length; i += 1) {
-      hash = (hash * 33) ^ seed.charCodeAt(i);
+    const existing = this.fallbackStockMap.get(seed);
+    if (existing !== undefined) {
+      return existing;
     }
-    const normalized = Math.abs(hash) % 20; // 0 - 19
-    return normalized + 5; // 5 - 24 unidades
+
+    const usedValues = new Set(this.fallbackStockMap.values());
+    let attempts = 0;
+    let generated = 0;
+
+    do {
+      generated = Math.floor(Math.random() * 20) + 5; // 5 - 24 unidades
+      attempts += 1;
+      if (!usedValues.has(generated) || attempts > 10) {
+        break;
+      }
+    } while (true);
+
+    this.fallbackStockMap.set(seed, generated);
+    return generated;
   }
 
   private refreshMetadata(): void {
