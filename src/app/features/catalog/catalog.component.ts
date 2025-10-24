@@ -181,8 +181,10 @@ export class CatalogComponent implements OnInit {
     const category = (product.categoria || 'otros').trim().toLowerCase();
     const description = product.description || 'Sin descripción disponible.';
     const price = Number.isFinite(product.precio) ? Number(product.precio) : 0;
-    const stock = product.stock && product.stock > 0 ? product.stock : this.getFallbackStock(id);
-    const inStock = (product.estado ?? 'activo') !== 'inactivo' && stock > 0;
+    const hasBackendStock = typeof product.stock === 'number' && product.stock > 0;
+    const stock = hasBackendStock ? product.stock : this.getFallbackStock(id);
+    const status = hasBackendStock ? product.estado ?? 'activo' : 'activo';
+    const inStock = status !== 'inactivo' && stock > 0;
     const image = product.imagenUrl || this.getPlaceholderImage(id);
 
     return {
