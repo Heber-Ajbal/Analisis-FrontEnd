@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -8,26 +8,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { CartService } from './cart.service';
-
-interface CartItem {
-  id: string;
-  name: string;
-  brand: string;
-  price: number;
-  quantity: number;
-  stock: number;
-  image: string;
-  compatibility: string;
-}
-
-interface ShippingOption {
-  id: string;
-  label: string;
-  description: string;
-  cost: number;
-}
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { CartItem, CartService, ShippingOption } from './cart.service';
 
 @Component({
   selector: 'app-cart',
@@ -43,44 +26,14 @@ interface ShippingOption {
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDialogModule,
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
 })
-export class CartComponent implements OnInit {
-  cartItems: CartItem[] = [
-    {
-      id: 'oil-filter-honda',
-      name: 'Filtro de aceite original',
-      brand: 'Honda',
-      price: 249,
-      quantity: 1,
-      stock: 6,
-      image: 'https://images.unsplash.com/photo-1523924836167-327e0b1ad3d0?auto=format&fit=crop&w=900&q=80',
-      compatibility: 'Civic 2016-2020 · HR-V 2017-2022',
-    },
-    {
-      id: 'brake-pads-toyota',
-      name: 'Pastillas de freno cerámicas',
-      brand: 'Toyota',
-      price: 545,
-      quantity: 2,
-      stock: 12,
-      image: 'https://images.unsplash.com/photo-1580130857273-263566ae5d8b?auto=format&fit=crop&w=900&q=80',
-      compatibility: 'Corolla 2014-2019 · Camry 2015-2020',
-    },
-    {
-      id: 'spark-plugs-hyundai',
-      name: 'Juego de bujías platino',
-      brand: 'Hyundai',
-      price: 365,
-      quantity: 1,
-      stock: 8,
-      image: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=900&q=80',
-      compatibility: 'Elantra 2017-2022 · Tucson 2018-2023',
-    },
-  ];
+export class CartComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  cartItems: CartItem[] = [];
 
   shippingOptions: ShippingOption[] = [
     {
@@ -115,8 +68,7 @@ export class CartComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private router: Router,
-    private fb: FormBuilder,
-    private dialog: MatDialog
+    private fb: FormBuilder
   ) {
     this.paymentForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -133,16 +85,48 @@ export class CartComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Cargar datos del carrito desde el servicio si existen
+    this.cartService
+      .getCartItems()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.cartItems = items;
+      });
+
+    this.cartService
+      .getSelectedShipping()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((shipping) => {
+        if (shipping) {
+          this.selectedShipping = shipping;
+        }
+      });
+
+    this.cartService
+      .getAppliedCoupon()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((coupon) => {
+        this.appliedCoupon = coupon;
+        if (coupon) {
+          this.couponCode = coupon;
+          this.couponMessage = 'Cupón AHORRA10 aplicado · -10% sobre los productos (hasta Q50).';
+          this.couponSuccess = true;
+        } else {
+          this.couponSuccess = false;
+          if (!this.couponCode) {
+            this.couponMessage = 'Ingresa un código para aplicar un descuento.';
+          }
+        }
+      });
+
     const state = this.cartService.getCurrentCartState();
-    if (state.items.length > 0) {
-      this.cartItems = state.items;
-    }
-    if (state.shipping) {
+    if (!state.shipping) {
+      this.cartService.setSelectedShipping(this.selectedShipping);
+    } else {
       this.selectedShipping = state.shipping;
     }
+
     if (state.coupon) {
-      this.appliedCoupon = state.coupon;
+      this.cartService.setAppliedCoupon(state.coupon);
     }
   }
 
@@ -170,22 +154,16 @@ export class CartComponent implements OnInit {
   }
 
   updateQuantity(itemId: string, delta: number): void {
-    this.cartItems = this.cartItems.map((item) => {
-      if (item.id !== itemId) {
-        return item;
-      }
-
-      const nextQuantity = Math.min(Math.max(item.quantity + delta, 1), item.stock);
-      return { ...item, quantity: nextQuantity };
-    });
+    this.cartService.changeItemQuantity(itemId, delta);
   }
 
   removeItem(itemId: string): void {
-    this.cartItems = this.cartItems.filter((item) => item.id !== itemId);
+    this.cartService.removeItem(itemId);
   }
 
   selectShipping(option: ShippingOption): void {
     this.selectedShipping = option;
+    this.cartService.setSelectedShipping(option);
   }
 
   applyCoupon(): void {
@@ -203,16 +181,22 @@ export class CartComponent implements OnInit {
       this.couponCode = normalized;
       this.couponMessage = 'Cupón AHORRA10 aplicado · -10% sobre los productos (hasta Q50).';
       this.couponSuccess = true;
+      this.cartService.setAppliedCoupon('AHORRA10');
     } else {
       this.appliedCoupon = null;
       this.couponMessage = 'Cupón no reconocido. Verifica el código e inténtalo de nuevo.';
       this.couponSuccess = false;
+      this.cartService.setAppliedCoupon(null);
     }
   }
 
   clearCart(): void {
+    this.cartService.clearCart();
     this.cartItems = [];
     this.appliedCoupon = null;
+    this.couponCode = '';
+    this.couponMessage = 'Ingresa un código para aplicar un descuento.';
+    this.couponSuccess = false;
   }
 
   proceedToCheckout(): void {
@@ -262,6 +246,11 @@ export class CartComponent implements OnInit {
     this.showPaymentForm = false;
     this.paymentForm.reset();
     this.router.navigate(['/catalogo']);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getErrorMessage(fieldName: string): string {

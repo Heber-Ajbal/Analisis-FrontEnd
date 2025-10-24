@@ -1,0 +1,87 @@
+<div class="profile-page">
+  <section class="profile-container">
+    <header class="profile-header">
+      <h1>Mi perfil</h1>
+      <p>Consulta la información asociada a tu cuenta y mantenla siempre actualizada.</p>
+    </header>
+
+    <div *ngIf="loading" class="profile-loading" aria-live="polite">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+      <p>Cargando información del perfil...</p>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <ng-container *ngIf="user; else errorState">
+        <mat-card class="profile-card">
+          <mat-card-header>
+            <div mat-card-avatar class="profile-avatar">{{ displayInitials }}</div>
+            <mat-card-title>{{ displayName }}</mat-card-title>
+            <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <dl class="profile-details">
+              <div>
+                <dt>Usuario</dt>
+                <dd>{{ user.username || 'Sin usuario' }}</dd>
+              </div>
+              <div>
+                <dt>Nombre completo</dt>
+                <dd>{{ user.fullName || 'Sin información' }}</dd>
+              </div>
+              <div>
+                <dt>Rol</dt>
+                <dd>{{ user.roleName || ('#' + user.roleId) || 'No asignado' }}</dd>
+              </div>
+              <div>
+                <dt>Estado</dt>
+                <dd>
+                  <span
+                    class="status-pill"
+                    [class.status-pill--active]="user.confirmed && !user.blocked"
+                    [class.status-pill--blocked]="user.blocked"
+                  >
+                    <mat-icon>{{ user.blocked ? 'block' : user.confirmed ? 'verified_user' : 'hourglass_top' }}</mat-icon>
+                    {{ accountStatusLabel }}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>Fecha de registro</dt>
+                <dd>{{ user.createdAt | date : 'medium' }}</dd>
+              </div>
+              <div>
+                <dt>Última actualización</dt>
+                <dd>{{ user.updatedAt | date : 'medium' }}</dd>
+              </div>
+            </dl>
+          </mat-card-content>
+
+          <mat-card-actions class="profile-actions">
+            <button mat-flat-button color="primary" type="button" (click)="loadProfile()">
+              <mat-icon>refresh</mat-icon>
+              Actualizar datos
+            </button>
+            <a mat-stroked-button color="primary" routerLink="/catalogo">
+              <mat-icon>storefront</mat-icon>
+              Ir al catálogo
+            </a>
+          </mat-card-actions>
+        </mat-card>
+      </ng-container>
+    </ng-container>
+
+    <ng-template #errorState>
+      <mat-card class="profile-error">
+        <mat-card-content>
+          <mat-icon>sentiment_dissatisfied</mat-icon>
+          <p>{{ error || 'No fue posible recuperar tu información de perfil.' }}</p>
+          <div class="error-actions">
+            <button mat-flat-button color="primary" type="button" (click)="loadProfile()">Reintentar</button>
+            <a mat-button routerLink="/login">Iniciar sesión</a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
+  </section>
+</div>
