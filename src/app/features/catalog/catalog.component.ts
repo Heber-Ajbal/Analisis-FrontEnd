@@ -179,7 +179,7 @@ export class CatalogComponent implements OnInit {
     const category = (product.categoria || 'otros').trim().toLowerCase();
     const description = product.description || 'Sin descripción disponible.';
     const price = Number.isFinite(product.precio) ? Number(product.precio) : 0;
-    const stock = product.stock && product.stock > 0 ? product.stock : 10;
+    const stock = product.stock && product.stock > 0 ? product.stock : this.getFallbackStock(id);
     const inStock = product.estado !== 'inactivo';
     const image = product.imagenUrl || this.getPlaceholderImage(id);
 
@@ -203,6 +203,15 @@ export class CatalogComponent implements OnInit {
     }
     const index = hash % PLACEHOLDER_IMAGES.length;
     return PLACEHOLDER_IMAGES[index];
+  }
+
+  private getFallbackStock(seed: string): number {
+    let hash = 5381;
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash * 33) ^ seed.charCodeAt(i);
+    }
+    const normalized = Math.abs(hash) % 20; // 0 - 19
+    return normalized + 5; // 5 - 24 unidades
   }
 
   private refreshMetadata(): void {
