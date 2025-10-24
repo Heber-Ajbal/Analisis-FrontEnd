@@ -3,12 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import {
-  Product,
-  ProductApi,
-  mapApiToProduct,
-  mapApiToProducts,
-} from '../../models/inventory/inventory.models';
+import { Product, ProductApi, mapApiToProduct } from '../../models/inventory/inventory.models';
 
 type ProductsResponse = {
   data: ProductApi[];
@@ -21,40 +16,41 @@ export class InventoryService {
   private API = environment.apiBaseUrl; // p.ej. http://localhost:1337
 
   /**
-   * Obtiene todos los productos. La paginación y los filtros se manejan en el frontend.
+   * Server-side filters (Strapi):
+   * - q: busca por name o code
+   * - categoria: por type
+   * - page, pageSize: paginación
    */
-  async list(): Promise<Product[]> {
-    const pageSize = 100;
-    let page = 1;
-    let pageCount = 1;
-    const buffer: ProductApi[] = [];
+  async list(opts: { q?: string; categoria?: string | null; page?: number; pageSize?: number } = {})
+  : Promise<{ rows: Product[]; total: number; page: number; pageSize: number; pageCount: number }> {
+    let params = new HttpParams();
 
-    do {
-      const params = new HttpParams()
-        .set('pagination[page]', String(page))
-        .set('pagination[pageSize]', String(pageSize))
-        .set('sort', 'createdAt:desc');
+    // Búsqueda (containsi en name/code)
+    if (opts.q) {
+      params = params
+        .set('filters[$or][0][name][$containsi]', opts.q)
+        .set('filters[$or][1][code][$containsi]', opts.q);
+    }
 
-      const res = await firstValueFrom(
-        this.http.get<ProductsResponse>(`${this.API}/products`, { params })
-      );
+    // Filtro por categoría (type)
+    if (opts.categoria) params = params.set('filters[type][$eq]', opts.categoria);
 
-      const rows = res.data ?? [];
-      buffer.push(...rows);
+    // Paginación
+    const page = opts.page ?? 1;
+    const pageSize = opts.pageSize ?? 25;
+    params = params
+      .set('pagination[page]', page)
+      .set('pagination[pageSize]', pageSize)
+      .set('sort', 'createdAt:desc');
 
-      const pagination = res.meta?.pagination;
-      if (pagination) {
-        pageCount = Math.max(pagination.pageCount ?? pageCount, page);
-      }
+    const res = await firstValueFrom(
+      this.http.get<ProductsResponse>(`${this.API}/products`)
+    );
 
-      if (!pagination && rows.length < pageSize) {
-        break;
-      }
+    const rows = (res.data ?? []).map(mapApiToProduct);
+    const meta = res.meta?.pagination ?? { page, pageSize, pageCount: 1, total: rows.length };
 
-      page += 1;
-    } while (page <= pageCount);
-
-    return mapApiToProducts(buffer);
+    return { rows, total: meta.total, page: meta.page, pageSize: meta.pageSize, pageCount: meta.pageCount };
   }
 
   async create(p: {
