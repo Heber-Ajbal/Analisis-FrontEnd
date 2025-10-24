@@ -9,15 +9,32 @@
  */
 export interface ProductApi {
   readonly id: number;
-  readonly documentId: string;
-  code: string;
-  name: string;
+  readonly documentId?: string;
+  code?: string;
+  name?: string;
   description?: string | null;
   vendorCode?: string;
-  salePrice?: number;
-  wholesalePrice?: number;
-  retailPrice?: number;
-  type?: string;
+  salePrice?: number | null;
+  wholesalePrice?: number | null;
+  retailPrice?: number | null;
+  type?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
+  // When Strapi is configured with "documentId" the payload usually comes under attributes
+  attributes?: ProductApiAttributes;
+}
+
+export interface ProductApiAttributes {
+  documentId?: string;
+  code?: string;
+  name?: string;
+  description?: string | null;
+  vendorCode?: string;
+  salePrice?: number | null;
+  wholesalePrice?: number | null;
+  retailPrice?: number | null;
+  type?: string | null;
   createdAt?: string;
   updatedAt?: string;
   publishedAt?: string;
@@ -78,7 +95,16 @@ const determineProductStatus = (stock: number, minimo: number): ProductStatus =>
  * @returns Best available price
  */
 const extractPrice = (apiProduct: ProductApi): number => {
-  return apiProduct.retailPrice ?? apiProduct.salePrice ?? DEFAULT_PRICE;
+  const source = getPrimarySource(apiProduct);
+  return source.retailPrice ?? source.salePrice ?? DEFAULT_PRICE;
+};
+
+const getPrimarySource = (apiProduct: ProductApi): ProductApiAttributes & ProductApi => {
+  const attrs = apiProduct.attributes ?? {};
+  return {
+    ...apiProduct,
+    ...attrs,
+  };
 };
 
 /**
@@ -91,6 +117,7 @@ const extractPrice = (apiProduct: ProductApi): number => {
  * console.log(product.estado); // 'activo' | 'inactivo' | 'bajo-stock'
  */
 export function mapApiToProduct(apiProduct: ProductApi): Product {
+  const source = getPrimarySource(apiProduct);
   const precio = extractPrice(apiProduct);
   const stock = DEFAULT_STOCK; // TODO: Connect to real stock endpoint
   const minimo = DEFAULT_MIN_STOCK; // TODO: Connect to minimum stock configuration
@@ -98,12 +125,12 @@ export function mapApiToProduct(apiProduct: ProductApi): Product {
 
   return {
     id: apiProduct.id,
-    documentId: apiProduct.documentId,
-    sku: apiProduct.code,
-    nombre: apiProduct.name,
-    description: apiProduct.description ?? '',
-    categoria: apiProduct.type ?? null,
-    proveedor: apiProduct.vendorCode ?? null,
+    documentId: source.documentId ?? String(apiProduct.id),
+    sku: source.code ?? '',
+    nombre: source.name ?? '',
+    description: source.description ?? '',
+    categoria: source.type ?? null,
+    proveedor: source.vendorCode ?? null,
     precio,
     stock,
     minimo,
