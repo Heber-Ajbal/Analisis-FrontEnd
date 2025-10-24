@@ -44,7 +44,7 @@ export class InventoryService {
       .set('sort', 'createdAt:desc');
 
     const res = await firstValueFrom(
-      this.http.get<ProductsResponse>(`${this.API}/products`)
+      this.http.get<ProductsResponse>(`${this.API}/products`, { params })
     );
 
     const rows = (res.data ?? []).map(mapApiToProduct);

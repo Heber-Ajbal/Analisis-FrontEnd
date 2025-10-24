@@ -12,7 +12,7 @@ export interface ProductApi {
   readonly documentId: string;
   code: string;
   name: string;
-  description: string;
+  description?: string | null;
   vendorCode?: string;
   salePrice?: number;
   wholesalePrice?: number;
@@ -101,7 +101,7 @@ export function mapApiToProduct(apiProduct: ProductApi): Product {
     documentId: apiProduct.documentId,
     sku: apiProduct.code,
     nombre: apiProduct.name,
-    description: apiProduct.description,
+    description: apiProduct.description ?? '',
     categoria: apiProduct.type ?? null,
     proveedor: apiProduct.vendorCode ?? null,
     precio,

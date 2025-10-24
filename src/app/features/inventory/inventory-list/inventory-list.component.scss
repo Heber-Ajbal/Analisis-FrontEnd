@@ -1,175 +1,212 @@
-/* =========================
-   Inventario – estilos UI
-   ========================= */
-
-/* ---- Tokens rápidos ---- */
-$bg-page: #fbfbfe;
-$card-bg: rgba(255,255,255,.85);
-$shadow-1: 0 1px 0 rgba(0,0,0,.04), 0 8px 30px rgba(21,40,99,.06);
-$radius-lg: 18px;
-
 :host {
   display: block;
-  background: $bg-page;
+  padding: 24px;
+  background: var(--mat-sys-surface, #f5f6fb);
   min-height: 100%;
 }
 
-/* ---- Layout de página ---- */
-.page {
-  display: grid;
+.inventory {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  padding: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.spacer { flex: 1 1 auto; }
-.muted { opacity: .65; }
-
-/* ---- Toolbar “luxe” ---- */
-.toolbar.luxe {
-  margin: 8px auto;
-  max-width: 1200px;
-  border-radius: $radius-lg;
-  padding: 6px 10px;
-  background: linear-gradient(180deg, #fff 0%, #f4f6ff 100%);
-  box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 6px 20px rgba(35,44,90,.06);
-}
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-.brand .hint { font-weight: 500; opacity: .45; margin-left: 4px; }
-.toolbar-actions { display: flex; gap: 8px; }
-.pill { border-radius: 999px; padding-inline: 14px; }
-.ghost { border-color: rgba(0,0,0,.08); }
-
-/* ---- Cards ---- */
-.card {
-  border-radius: $radius-lg;
-  background: $card-bg;
-  backdrop-filter: saturate(1.6) blur(4px);
-  box-shadow: $shadow-1;
 }
 
-/* ---- Filtros ---- */
-.filters { padding: 12px; }
-.filters-grid {
-  display: grid;
-  grid-template-columns: 1fr 200px 160px;
+.inventory__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.inventory__title {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
-@media (max-width: 860px) {
-  .filters-grid { grid-template-columns: 1fr; }
-}
-.field mat-icon[matPrefix] { opacity: .65; margin-right: 6px; }
-.chips { padding-top: 6px; }
-.chip { border-radius: 999px; }
 
-/* =========================
-   Tabla (Angular Material)
-   ========================= */
-
-/* Card contenedora */
-.table-card { padding: 6px; }
-
-/* Cabecera encima de la tabla */
-.table-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 8px 8px;
+.inventory__title-icon {
+  background: rgba(63, 81, 181, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  color: #3f51b5;
 }
 
-/* Contenedor con radios para que el hover no se “salga” */
-.table-wrap { overflow: auto; border-radius: 12px; }
-
-/* Ajustes tipográficos */
-th, td { white-space: nowrap; }
-th { font-weight: 700; }
-.th-mono { font-variant-numeric: tabular-nums; }
-
-/* ==== EL FIX IMPORTANTE ==== */
-/* 1) Quitar los separadores por defecto de MDC (causaban la línea rara) */
-.mat-mdc-table .mat-mdc-cell::after,
-.mat-mdc-table .mat-mdc-header-cell::after,
-.mat-mdc-table .mat-mdc-footer-cell::after {
-  border-bottom: 0 !important;
-  content: none !important;
-}
-
-/* 2) Nuestro divisor sutil por fila */
-.mat-mdc-row {
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
-  transition: background .15s ease;
-}
-.mat-mdc-row:hover { background: #f6f7ff; }
-
-/* Cabecera fija y limpia */
-.sticky {
-  position: sticky; top: 0; z-index: 1;
-  background: #fff;
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
-}
-
-/* Columna Acciones: compacta y alineada */
-.mat-mdc-table .mat-mdc-cell.mat-column-acciones,
-.mat-mdc-table .mat-mdc-header-cell.mat-column-acciones,
-.mat-mdc-table .mat-mdc-footer-cell.mat-column-acciones {
-  width: 56px;
-  text-align: right;
-}
-
-/* (por si algún tema repone el ::after en esa columna) */
-.mat-mdc-table .mat-mdc-cell.mat-column-acciones::after,
-.mat-mdc-table .mat-mdc-header-cell.mat-column-acciones::after,
-.mat-mdc-table .mat-mdc-footer-cell.mat-column-acciones::after {
-  border-bottom: 0 !important;
-  content: none !important;
-}
-
-/* =========================
-   Celdas y badges
-   ========================= */
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  letter-spacing: .5px;
-}
-
-.prod { display: flex; align-items: center; gap: 12px; }
-.prod img { width: 38px; height: 38px; object-fit: cover; border-radius: 10px; }
-.prod .col { min-width: 220px; }
-.p-name { font-weight: 700; }
-.p-meta { opacity: .65; font-size: .86rem; }
-
-.badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
+.inventory__title h1 {
+  margin: 0;
+  font-size: 1.6rem;
   font-weight: 600;
-  font-size: .82rem;
 }
-.badge--ok   { background: #e8f5e9; color: #2e7d32; }
-.badge--warn { background: #fff4e5; color: #a15c00; }
-.badge--muted{ background: #eceff1; color: #455a64; }
 
-/* Estados visuales */
-.strong { font-weight: 800; }
-.low { color: #d32f2f; }
-.min { opacity: .55; margin-left: 6px; }
-
-/* Botón “danger” liviano */
-button.danger { color: #b71c1c; }
-button.danger.ghost { border-color: rgba(183,28,28,.18); }
-
-/* ===== Fallback si tu tema tiene mucha especificidad =====
-   Si tras guardar aún vieras la línea rara, habilita el bloque
-   de abajo (quita los //) para forzar los estilos con ::ng-deep. */
-/*
-:host ::ng-deep .mat-mdc-table .mat-mdc-cell::after,
-:host ::ng-deep .mat-mdc-table .mat-mdc-header-cell::after,
-:host ::ng-deep .mat-mdc-table .mat-mdc-footer-cell::after {
-  border-bottom: 0 !important;
-  content: none !important;
+.inventory__title p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
-:host ::ng-deep .mat-mdc-table .mat-mdc-cell.mat-column-acciones::after,
-:host ::ng-deep .mat-mdc-table .mat-mdc-header-cell.mat-column-acciones::after,
-:host ::ng-deep .mat-mdc-table .mat-mdc-footer-cell.mat-column-acciones::after {
-  border-bottom: 0 !important;
-  content: none !important;
+
+.filters {
+  padding: 20px;
 }
-*/
+
+.filters__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.filters__reset {
+  height: 56px;
+  justify-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-card__wrap {
+  overflow-x: auto;
+}
+
+.table-card__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: #6b7280;
+}
+
+.table-card__state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.table-card__state--empty mat-icon {
+  color: rgba(63, 81, 181, 0.35);
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(107, 114, 128, 0.12);
+}
+
+.inventory-table thead {
+  background: rgba(63, 81, 181, 0.06);
+}
+
+.inventory-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4b5563;
+}
+
+.inventory-table tbody tr:hover {
+  background: rgba(63, 81, 181, 0.05);
+}
+
+.sku {
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+  font-size: 0.85rem;
+  background: rgba(63, 81, 181, 0.08);
+  color: #3f51b5;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product__name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.product__meta {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.price {
+  font-weight: 600;
+  color: #111827;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status.activo {
+  background: rgba(76, 175, 80, 0.15);
+  color: #2e7d32;
+}
+
+.status.bajo-stock {
+  background: rgba(255, 152, 0, 0.18);
+  color: #b45309;
+}
+
+.status.inactivo {
+  background: rgba(156, 163, 175, 0.25);
+  color: #4b5563;
+}
+
+.actions {
+  width: 120px;
+  text-align: center;
+}
+
+.actions button {
+  color: #3f51b5;
+}
+
+mat-paginator {
+  border-top: 1px solid rgba(107, 114, 128, 0.12);
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 16px;
+  }
+
+  .inventory__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inventory__title {
+    align-items: flex-start;
+  }
+
+  .filters__reset {
+    width: 100%;
+    justify-content: center;
+  }
+}

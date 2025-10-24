@@ -1,26 +1,20 @@
 // src/app/features/inventory/inventory-list/inventory-list.component.ts
-import { Component, computed, effect, signal, OnInit, inject } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 // Material
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { InventoryService } from '../../../core/services/inventory.service';
 import { Product } from '../../../models/inventory/inventory.models';
@@ -33,24 +27,17 @@ import { StockMovementsDrawerComponent } from '../stock-movements-drawer/stock-m
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
-    MatToolbarModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatChipsModule,
     MatSelectModule,
-    MatTableModule,
-    MatSortModule,
     MatPaginatorModule,
-    MatCheckboxModule,
     MatTooltipModule,
     MatDialogModule,
-    MatSidenavModule,
-    MatDividerModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './inventory-list.component.html',
   styleUrls: ['./inventory-list.component.scss'],
@@ -68,42 +55,90 @@ export class InventoryListComponent implements OnInit {
   categoria = signal<string | null>(null); // mapea a 'type' del API
   estado = signal<string | null>(null); // de momento SIN USO real (no viene del API)
 
-  // Selección
-
   private inv = inject(InventoryService);
   private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
+
+  private requestId = 0;
 
   ngOnInit() {
-    // carga inicial
-    this.fetch();
-
     // recarga al cambiar q/categoria/página
     effect(() => {
-      // disparador (simple). Si quieres debounce, podemos añadirlo.
-      this.q();
-      this.categoria();
-      this.page();
-      this.pageSize();
-      this.fetch();
+      const q = this.q();
+      const categoria = this.categoria();
+      const page = this.page();
+      const pageSize = this.pageSize();
+
+      void this.fetch({ q, categoria, page, pageSize });
     });
   }
 
-  async fetch() {
+  async fetch({
+    q,
+    categoria,
+    page,
+    pageSize,
+  }: {
+    q: string;
+    categoria: string | null;
+    page: number;
+    pageSize: number;
+  }) {
+    const currentRequest = ++this.requestId;
     this.loading.set(true);
     try {
       const res = await this.inv.list({
-        q: this.q() || undefined,
-        categoria: this.categoria(),
-        page: this.page(),
-        pageSize: this.pageSize(),
+        q: q || undefined,
+        categoria,
+        page,
+        pageSize,
       });
+      if (currentRequest !== this.requestId) return;
+
       this.source.set(res.rows);
       this.total.set(res.total);
-      this.page.set(res.page);
-      this.pageSize.set(res.pageSize);
+      if (this.page() !== res.page) this.page.set(res.page);
+      if (this.pageSize() !== res.pageSize) this.pageSize.set(res.pageSize);
+    } catch (e: any) {
+      this.snack.open(e?.error?.message ?? 'No se pudo cargar el inventario', 'Cerrar', {
+        duration: 3000,
+      });
     } finally {
-      this.loading.set(false);
+      if (currentRequest === this.requestId) {
+        this.loading.set(false);
+      }
     }
+  }
+
+  private refresh() {
+    void this.fetch({
+      q: this.q(),
+      categoria: this.categoria(),
+      page: this.page(),
+      pageSize: this.pageSize(),
+    });
+  }
+
+  onSearch(value: string) {
+    this.q.set(value.trim());
+    this.page.set(1);
+  }
+
+  onCategoria(value: string | null) {
+    this.categoria.set(value || null);
+    this.page.set(1);
+  }
+
+  resetFilters() {
+    this.q.set('');
+    this.categoria.set(null);
+    this.page.set(1);
+  }
+
+  onPage(event: PageEvent) {
+    const newPage = event.pageIndex + 1;
+    if (this.page() !== newPage) this.page.set(newPage);
+    if (this.pageSize() !== event.pageSize) this.pageSize.set(event.pageSize);
   }
 
   // Computados para la tabla (client-side ya NO filtra, solo refleja 'source')
@@ -121,13 +156,13 @@ export class InventoryListComponent implements OnInit {
   openNew() {
     const ref = this.dialog.open(ProductFormDialogComponent, { width: '720px', data: null });
     ref.afterClosed().subscribe((saved) => {
-      if (saved) this.fetch();
+      if (saved) this.refresh();
     });
   }
   openEdit(p: Product) {
     const ref = this.dialog.open(ProductFormDialogComponent, { width: '720px', data: p });
     ref.afterClosed().subscribe((saved) => {
-      if (saved) this.fetch();
+      if (saved) this.refresh();
     });
   }
   openMoves(p: Product) {
