@@ -1,7 +1,7 @@
 // src/app/features/inventory/inventory-list/inventory-list.component.ts
 import { Component, computed, effect, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Material
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,12 +15,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatCheckboxModule, MatCheckboxChange } from '@angular/material/checkbox';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { InventoryService } from '../../../core/services/inventory.service';
 import { Product } from '../../../models/inventory/inventory.models';
@@ -51,6 +52,7 @@ import { StockMovementsDrawerComponent } from '../stock-movements-drawer/stock-m
     MatDialogModule,
     MatSidenavModule,
     MatDividerModule,
+    MatProgressBarModule,
   ],
   templateUrl: './inventory-list.component.html',
   styleUrls: ['./inventory-list.component.scss'],
@@ -66,9 +68,11 @@ export class InventoryListComponent implements OnInit {
   // Filtros y búsqueda
   q = signal('');
   categoria = signal<string | null>(null); // mapea a 'type' del API
-  estado = signal<string | null>(null); // de momento SIN USO real (no viene del API)
+  estado = signal<string | null>(null);    // de momento SIN USO real (no viene del API)
 
-  // Selección
+  // Tabla
+  displayedColumns = ['sku', 'nombre', 'precio', 'stock', 'estado', 'acciones'];
+  skeletonRows = Array.from({ length: 6 });
 
   private inv = inject(InventoryService);
   private dialog = inject(MatDialog);
@@ -77,9 +81,8 @@ export class InventoryListComponent implements OnInit {
     // carga inicial
     this.fetch();
 
-    // recarga al cambiar q/categoria/página
+    // recarga al cambiar q/categoria/página/tamaño
     effect(() => {
-      // disparador (simple). Si quieres debounce, podemos añadirlo.
       this.q();
       this.categoria();
       this.page();
@@ -117,19 +120,59 @@ export class InventoryListComponent implements OnInit {
     return Array.from(set);
   });
 
-  // Acciones (de momento sin API reales para CRUD)
+  // Paginación (MatPaginator usa base 0)
+  onPage(e: PageEvent) {
+    this.page.set(e.pageIndex + 1);
+    this.pageSize.set(e.pageSize);
+  }
+
+  // Filtros
+  resetFilters() {
+    this.q.set('');
+    this.categoria.set(null);
+    this.estado.set(null);
+    this.page.set(1);
+  }
+
+  // UI helpers
+  badgeClass(e: Product) {
+    return {
+      'badge': true,
+      'badge--ok': e.estado === 'activo',
+      'badge--warn': e.estado === 'bajo-stock',
+      'badge--muted': e.estado === 'inactivo',
+    };
+  }
+
+  stockPct(e: Product): number {
+    const min = Math.max(1, Number((e as any).minimo) || 1);
+    const cur = Math.max(0, Number((e as any).stock) || 0);
+    // 0% al 0, 100% cuando duplica el mínimo (ajustable)
+    const pct = (cur / (min * 2)) * 100;
+    return Math.max(4, Math.min(100, Math.round(pct)));
+  }
+
+  statusFor(e: Product): 'ok' | 'warn' | 'off' {
+    if (e.estado === 'inactivo') return 'off';
+    if ((e as any).stock <= (e as any).minimo) return 'warn';
+    return 'ok';
+  }
+
+  // Acciones
   openNew() {
     const ref = this.dialog.open(ProductFormDialogComponent, { width: '720px', data: null });
     ref.afterClosed().subscribe((saved) => {
       if (saved) this.fetch();
     });
   }
+
   openEdit(p: Product) {
     const ref = this.dialog.open(ProductFormDialogComponent, { width: '720px', data: p });
     ref.afterClosed().subscribe((saved) => {
       if (saved) this.fetch();
     });
   }
+
   openMoves(p: Product) {
     this.dialog.open(StockMovementsDrawerComponent, {
       panelClass: 'drawer-panel',
@@ -137,5 +180,4 @@ export class InventoryListComponent implements OnInit {
       width: '520px',
     });
   }
-
 }
