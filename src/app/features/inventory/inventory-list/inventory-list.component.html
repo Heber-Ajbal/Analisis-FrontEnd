@@ -52,12 +52,12 @@
     </div>
 
     <ng-container *ngIf="!loading()">
-      <div class="table-card__state table-card__state--empty" *ngIf="rows().length === 0">
+      <div class="table-card__state table-card__state--empty" *ngIf="total() === 0">
         <mat-icon>inventory</mat-icon>
         <p>No hay productos para mostrar.</p>
       </div>
 
-      <ng-container *ngIf="rows().length > 0">
+      <ng-container *ngIf="total() > 0">
         <div class="table-card__wrap">
           <table class="inventory-table">
             <thead>

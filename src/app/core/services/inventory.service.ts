@@ -16,41 +16,19 @@ export class InventoryService {
   private API = environment.apiBaseUrl; // p.ej. http://localhost:1337
 
   /**
-   * Server-side filters (Strapi):
-   * - q: busca por name o code
-   * - categoria: por type
-   * - page, pageSize: paginación
+   * Obtiene todos los productos. La paginación y los filtros se manejan en el frontend.
    */
-  async list(opts: { q?: string; categoria?: string | null; page?: number; pageSize?: number } = {})
-  : Promise<{ rows: Product[]; total: number; page: number; pageSize: number; pageCount: number }> {
-    let params = new HttpParams();
-
-    // Búsqueda (containsi en name/code)
-    if (opts.q) {
-      params = params
-        .set('filters[$or][0][name][$containsi]', opts.q)
-        .set('filters[$or][1][code][$containsi]', opts.q);
-    }
-
-    // Filtro por categoría (type)
-    if (opts.categoria) params = params.set('filters[type][$eq]', opts.categoria);
-
-    // Paginación
-    const page = opts.page ?? 1;
-    const pageSize = opts.pageSize ?? 25;
-    params = params
-      .set('pagination[page]', page)
-      .set('pagination[pageSize]', pageSize)
+  async list(): Promise<Product[]> {
+    const params = new HttpParams()
+      .set('pagination[page]', '1')
+      .set('pagination[pageSize]', '-1')
       .set('sort', 'createdAt:desc');
 
     const res = await firstValueFrom(
       this.http.get<ProductsResponse>(`${this.API}/products`, { params })
     );
 
-    const rows = (res.data ?? []).map(mapApiToProduct);
-    const meta = res.meta?.pagination ?? { page, pageSize, pageCount: 1, total: rows.length };
-
-    return { rows, total: meta.total, page: meta.page, pageSize: meta.pageSize, pageCount: meta.pageCount };
+    return (res.data ?? []).map(mapApiToProduct);
   }
 
   async create(p: {

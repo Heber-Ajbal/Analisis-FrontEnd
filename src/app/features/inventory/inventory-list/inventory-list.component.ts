@@ -45,7 +45,6 @@ import { StockMovementsDrawerComponent } from '../stock-movements-drawer/stock-m
 export class InventoryListComponent implements OnInit {
   // Datos
   source = signal<Product[]>([]);
-  total = signal(0);
   page = signal(1);
   pageSize = signal(25);
   loading = signal(false);
@@ -61,44 +60,61 @@ export class InventoryListComponent implements OnInit {
 
   private requestId = 0;
 
-  ngOnInit() {
-    // recarga al cambiar q/categoria/página
-    effect(() => {
-      const q = this.q();
-      const categoria = this.categoria();
-      const page = this.page();
-      const pageSize = this.pageSize();
+  filteredRows = computed(() => {
+    const term = this.q().trim().toLowerCase();
+    const categoria = this.categoria();
 
-      void this.fetch({ q, categoria, page, pageSize });
+    return this.source().filter((product) => {
+      const matchesCategoria = !categoria || product.categoria === categoria;
+      const matchesTerm =
+        !term ||
+        product.sku.toLowerCase().includes(term) ||
+        product.nombre.toLowerCase().includes(term);
+      return matchesCategoria && matchesTerm;
     });
+  });
+
+  total = computed(() => this.filteredRows().length);
+
+  rows = computed(() => {
+    const page = this.page();
+    const pageSize = this.pageSize();
+    const start = (page - 1) * pageSize;
+    return this.filteredRows().slice(start, start + pageSize);
+  });
+
+  categorias = computed(() => {
+    const set = new Set(
+      this.source()
+        .map((p) => p.categoria)
+        .filter(Boolean) as string[]
+    );
+    return Array.from(set);
+  });
+
+  ngOnInit() {
+    effect(() => {
+      const total = this.total();
+      const pageSize = this.pageSize();
+      const maxPage = Math.max(1, Math.ceil(total / pageSize) || 1);
+      const currentPage = this.page();
+      if (currentPage > maxPage) {
+        this.page.set(maxPage);
+      }
+    });
+
+    void this.fetch();
   }
 
-  async fetch({
-    q,
-    categoria,
-    page,
-    pageSize,
-  }: {
-    q: string;
-    categoria: string | null;
-    page: number;
-    pageSize: number;
-  }) {
+  async fetch() {
     const currentRequest = ++this.requestId;
     this.loading.set(true);
     try {
-      const res = await this.inv.list({
-        q: q || undefined,
-        categoria,
-        page,
-        pageSize,
-      });
+      const rows = await this.inv.list();
       if (currentRequest !== this.requestId) return;
 
-      this.source.set(res.rows);
-      this.total.set(res.total);
-      if (this.page() !== res.page) this.page.set(res.page);
-      if (this.pageSize() !== res.pageSize) this.pageSize.set(res.pageSize);
+      this.source.set(rows);
+      this.page.set(1);
     } catch (e: any) {
       this.snack.open(e?.error?.message ?? 'No se pudo cargar el inventario', 'Cerrar', {
         duration: 3000,
@@ -111,12 +127,7 @@ export class InventoryListComponent implements OnInit {
   }
 
   private refresh() {
-    void this.fetch({
-      q: this.q(),
-      categoria: this.categoria(),
-      page: this.page(),
-      pageSize: this.pageSize(),
-    });
+    void this.fetch();
   }
 
   onSearch(value: string) {
@@ -140,17 +151,6 @@ export class InventoryListComponent implements OnInit {
     if (this.page() !== newPage) this.page.set(newPage);
     if (this.pageSize() !== event.pageSize) this.pageSize.set(event.pageSize);
   }
-
-  // Computados para la tabla (client-side ya NO filtra, solo refleja 'source')
-  rows = computed(() => this.source());
-  categorias = computed(() => {
-    const set = new Set(
-      this.source()
-        .map((p) => p.categoria)
-        .filter(Boolean) as string[]
-    );
-    return Array.from(set);
-  });
 
   // Acciones (de momento sin API reales para CRUD)
   openNew() {
