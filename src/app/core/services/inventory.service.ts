@@ -3,7 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Product, ProductApi, mapApiToProduct } from '../../models/inventory/inventory.models';
+import {
+  Product,
+  ProductApi,
+  mapApiToProduct,
+  mapApiToProducts,
+} from '../../models/inventory/inventory.models';
 
 type ProductsResponse = {
   data: ProductApi[];
@@ -19,16 +24,37 @@ export class InventoryService {
    * Obtiene todos los productos. La paginación y los filtros se manejan en el frontend.
    */
   async list(): Promise<Product[]> {
-    const params = new HttpParams()
-      .set('pagination[page]', '1')
-      .set('pagination[pageSize]', '-1')
-      .set('sort', 'createdAt:desc');
+    const pageSize = 100;
+    let page = 1;
+    let pageCount = 1;
+    const buffer: ProductApi[] = [];
 
-    const res = await firstValueFrom(
-      this.http.get<ProductsResponse>(`${this.API}/products`, { params })
-    );
+    do {
+      const params = new HttpParams()
+        .set('pagination[page]', String(page))
+        .set('pagination[pageSize]', String(pageSize))
+        .set('sort', 'createdAt:desc');
 
-    return (res.data ?? []).map(mapApiToProduct);
+      const res = await firstValueFrom(
+        this.http.get<ProductsResponse>(`${this.API}/products`, { params })
+      );
+
+      const rows = res.data ?? [];
+      buffer.push(...rows);
+
+      const pagination = res.meta?.pagination;
+      if (pagination) {
+        pageCount = Math.max(pagination.pageCount ?? pageCount, page);
+      }
+
+      if (!pagination && rows.length < pageSize) {
+        break;
+      }
+
+      page += 1;
+    } while (page <= pageCount);
+
+    return mapApiToProducts(buffer);
   }
 
   async create(p: {
