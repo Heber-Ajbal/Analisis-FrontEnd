@@ -1,541 +1,140 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario - Admin Portal</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<mat-toolbar class="toolbar luxe">
+  <div class="brand">
+    <mat-icon>inventory_2</mat-icon>
+    <span>Inventario</span>
+    <span class="hint">portal admin</span>
+  </div>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <span class="spacer"></span>
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+  <div class="toolbar-actions">
+    <button mat-flat-button color="primary" class="pill" (click)="openNew()">
+      <mat-icon>add</mat-icon><span>Nuevo</span>
+    </button>
+  </div>
+</mat-toolbar>
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            animation: slideDown 0.6s ease-out;
-        }
+<div class="page">
+  <!-- Filtros -->
+  <mat-card class="card filters">
+    <div class="filters-grid">
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Buscar</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="SKU, nombre, proveedor…" [value]="q()" (input)="q.set($any($event.target).value)" />
+        <button *ngIf="q()" matSuffix mat-icon-button aria-label="Clear" (click)="q.set('')">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      <mat-form-field appearance="fill" class="field w-200">
+        <mat-label>Categoría</mat-label>
+        <mat-icon matPrefix>category</mat-icon>
+        <mat-select [value]="categoria()" (selectionChange)="categoria.set($event.value)">
+          <mat-option [value]="null">Todas</mat-option>
+          <mat-option *ngFor="let c of categorias()" [value]="c">{{ c }}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: white;
-        }
-
-        .brand i {
-            font-size: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-
-        .brand h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .brand p {
-            font-size: 12px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-new {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .btn-new:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
-        }
-
-        /* Filters Card */
-        .filters-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.6s ease-out 0.1s both;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: 1fr 200px 160px;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        @media (max-width: 768px) {
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .filter-field {
-            position: relative;
-        }
-
-        .filter-field input,
-        .filter-field select {
-            width: 100%;
-            padding: 14px 16px 14px 45px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .filter-field input:focus,
-        .filter-field select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .filter-field icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 16px;
-        }
-
-        .filter-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .chips {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            min-height: 30px;
-        }
-
-        .chip {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: chipPop 0.3s ease;
-        }
-
-        @keyframes chipPop {
-            from {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .chip i {
-            cursor: pointer;
-            font-size: 14px;
-            transition: transform 0.2s;
-        }
-
-        .chip i:hover {
-            transform: scale(1.2);
-        }
-
-        /* Table Card */
-        .table-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.6s ease-out 0.2s both;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        th {
-            color: white;
-            padding: 20px 16px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        tbody tr:hover {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, transparent 100%);
-            transform: scale(1.01);
-            box-shadow: inset 0 0 10px rgba(102, 126, 234, 0.1);
-        }
-
-        .sku-mono {
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-
-        .product-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .product-img {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            object-fit: cover;
-            background: #f0f0f0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .product-info h4 {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .product-meta {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .price {
-            font-weight: 700;
-            color: #764ba2;
-            font-size: 15px;
-        }
-
-        .stock-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .stock-value {
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-        }
-
-        .stock-value.low {
-            color: #f5576c;
-        }
-
-        .stock-min {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .badge.ok {
-            background: rgba(76, 175, 80, 0.15);
-            color: #2e7d32;
-        }
-
-        .badge.ok::before {
-            background: #4caf50;
-        }
-
-        .badge.warn {
-            background: rgba(255, 152, 0, 0.15);
-            color: #e65100;
-        }
-
-        .badge.warn::before {
-            background: #ff9800;
-        }
-
-        .badge.inactive {
-            background: rgba(158, 158, 158, 0.15);
-            color: #616161;
-        }
-
-        .badge.inactive::before {
-            background: #9e9e9e;
-        }
-
-        .actions {
-            text-align: center;
-        }
-
-        .action-menu {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-        }
-
-        .btn-action {
-            width: 40px;
-            height: 40px;
-            border: none;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-action:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="brand">
-                <i class="fas fa-boxes"></i>
-                <div>
-                    <h1>Inventario</h1>
-                    <p>Portal Admin</p>
-                </div>
-            </div>
-            <button class="btn-new" onclick="alert('Nuevo producto')">
-                <i class="fas fa-plus"></i> Nuevo Producto
-            </button>
-        </div>
-
-        <!-- Filters -->
-        <div class="filters-card">
-            <div class="filters-grid">
-                <div class="filter-field">
-                    <label class="filter-label"><i class="fas fa-search"></i> Buscar</label>
-                    <input type="text" id="search" placeholder="SKU, nombre, proveedor…">
-                </div>
-                <div class="filter-field">
-                    <label class="filter-label"><i class="fas fa-tag"></i> Categoría</label>
-                    <select id="category">
-                        <option value="">Todas</option>
-                        <option value="Electrónica">Electrónica</option>
-                        <option value="Ropa">Ropa</option>
-                        <option value="Alimentos">Alimentos</option>
-                    </select>
-                </div>
-                <div class="filter-field">
-                    <label class="filter-label"><i class="fas fa-dot-circle"></i> Estado</label>
-                    <select id="status">
-                        <option value="">Todos</option>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                        <option value="bajo-stock">Bajo stock</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="chips" id="chips"></div>
-        </div>
-
-        <!-- Table -->
-        <div class="table-card">
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SKU</th>
-                            <th>Producto</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Datos dinámicos -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+      <mat-form-field appearance="fill" class="field w-160">
+        <mat-label>Estado</mat-label>
+        <mat-icon matPrefix>offline_pin</mat-icon>
+        <mat-select [value]="estado()" (selectionChange)="estado.set($event.value)">
+          <mat-option [value]="null">Todos</mat-option>
+          <mat-option value="activo">Activo</mat-option>
+          <mat-option value="inactivo">Inactivo</mat-option>
+          <mat-option value="bajo-stock">Bajo stock</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
-    <script>
-        // Datos de ejemplo
-        const productos = [
-            { sku: 'SKU-001', nombre: 'Laptop Pro', categoria: 'Electrónica', proveedor: 'TechCorp', precio: 1200, stock: 5, minimo: 10, estado: 'bajo-stock', imagen: '📱' },
-            { sku: 'SKU-002', nombre: 'Mouse Inalámbrico', categoria: 'Electrónica', proveedor: 'TechCorp', precio: 25, stock: 45, minimo: 20, estado: 'activo', imagen: '🖱️' },
-            { sku: 'SKU-003', nombre: 'Camiseta Premium', categoria: 'Ropa', proveedor: 'FashionBrand', precio: 35, stock: 0, minimo: 15, estado: 'inactivo', imagen: '👕' },
-            { sku: 'SKU-004', nombre: 'Café Premium 1kg', categoria: 'Alimentos', proveedor: 'CafeMundo', precio: 18, stock: 120, minimo: 50, estado: 'activo', imagen: '☕' },
-            { sku: 'SKU-005', nombre: 'Monitor 4K', categoria: 'Electrónica', proveedor: 'TechCorp', precio: 450, stock: 3, minimo: 5, estado: 'bajo-stock', imagen: '🖥️' },
-        ];
+    <div class="chips">
+      <mat-chip-set>
+        <mat-chip *ngIf="q()" class="chip" (removed)="q.set('')">
+          <mat-icon>search</mat-icon> {{ q() }} <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <mat-chip *ngIf="categoria()" class="chip" (removed)="categoria.set(null)">
+          <mat-icon>category</mat-icon> {{ categoria() }} <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <mat-chip *ngIf="estado()" class="chip" (removed)="estado.set(null)">
+          <mat-icon>offline_pin</mat-icon> {{ estado() }} <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </mat-card>
 
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = productos.map(p => `
-                <tr>
-                    <td><span class="sku-mono">${p.sku}</span></td>
-                    <td>
-                        <div class="product-cell">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50' y='50' font-size='50' text-anchor='middle' dy='.3em'%3E${p.imagen}%3C/text%3E%3C/svg%3E" class="product-img">
-                            <div class="product-info">
-                                <h4>${p.nombre}</h4>
-                                <div class="product-meta">${p.categoria} • ${p.proveedor}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="price">Q${p.precio}</span></td>
-                    <td>
-                        <div class="stock-info">
-                            <span class="stock-value ${p.stock <= p.minimo ? 'low' : ''}">${p.stock}</span>
-                            <span class="stock-min">/ mín ${p.minimo}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge ${p.estado === 'activo' ? 'ok' : p.estado === 'bajo-stock' ? 'warn' : 'inactive'}">
-                            ${p.estado.charAt(0).toUpperCase() + p.estado.slice(1)}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-menu">
-                            <button class="btn-action" title="Editar" onclick="alert('Editar: ${p.nombre}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-action" title="Historial" onclick="alert('Movimientos: ${p.nombre}')">
-                                <i class="fas fa-history"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
+  <!-- Tabla -->
+  <mat-card class="card table-card">
+    <div class="table-wrap">
+      <table mat-table [dataSource]="rows()" class="mat-elevation-z2 luxe-table">
 
-        // Inicializar
-        renderTable();
-    </script>
-</body>
-</html>
+
+
+        <!-- SKU -->
+        <ng-container matColumnDef="sku">
+          <th mat-header-cell *matHeaderCellDef class="th-mono">SKU</th>
+          <td mat-cell *matCellDef="let e"><span class="mono">{{ e.sku }}</span></td>
+        </ng-container>
+
+        <!-- Producto -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>Producto</th>
+          <td mat-cell *matCellDef="let e">
+            <div class="prod">
+              <img *ngIf="e.imagenUrl" [src]="e.imagenUrl" alt="" />
+              <div class="col">
+                <div class="p-name">{{ e.nombre }}</div>
+                <div class="p-meta">{{ e.categoria }} • {{ e.proveedor || '—' }}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Precio -->
+        <ng-container matColumnDef="precio">
+          <th mat-header-cell *matHeaderCellDef>Precio</th>
+          <td mat-cell *matCellDef="let e">{{ e.precio | currency:'Q' }}</td>
+        </ng-container>
+
+        <!-- Stock -->
+        <ng-container matColumnDef="stock">
+          <th mat-header-cell *matHeaderCellDef>Stock</th>
+          <td mat-cell *matCellDef="let e">
+            <span [class.low]="e.stock <= e.minimo" class="strong">{{ e.stock }}</span>
+            <span class="min">/ min {{ e.minimo }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let e">
+            <span class="badge"
+                  [class.badge--ok]="e.estado==='activo'"
+                  [class.badge--warn]="e.estado==='bajo-stock'"
+                  [class.badge--muted]="e.estado==='inactivo'">
+              {{ e.estado | titlecase }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let e" class="actions">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" aria-label="Acciones">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <button mat-menu-item (click)="openEdit(e)"><mat-icon>edit</mat-icon><span>Editar</span></button>
+              <button mat-menu-item (click)="openMoves(e)"><mat-icon>history</mat-icon><span>Movimientos</span></button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['sku','nombre','precio','stock','estado','acciones']" class="sticky"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['sku','nombre','precio','stock','estado','acciones'];" class="row"></tr>
+      </table>
+    </div>
+  </mat-card>
+</div>

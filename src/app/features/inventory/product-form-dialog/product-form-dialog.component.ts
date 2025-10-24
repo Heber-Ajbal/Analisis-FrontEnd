@@ -43,7 +43,7 @@ export class ProductFormDialogComponent {
       categoria: [data?.categoria ?? null],
       proveedor: [data?.proveedor ?? null],
       precio:    [data?.precio ?? 0, [Validators.required, Validators.min(0)]],
-      description: [''],
+      description: [data?.description ?? ''],
       imagenUrl: [data?.imagenUrl ?? null], // solo UI
       stock:     [data?.stock ?? 0],        // solo UI por ahora
       minimo:    [data?.minimo ?? 0],       // solo UI por ahora
