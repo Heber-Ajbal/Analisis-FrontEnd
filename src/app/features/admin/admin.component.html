@@ -1,0 +1,251 @@
+<mat-toolbar class="admin-toolbar">
+  <div class="toolbar-content">
+    <div class="toolbar-title">
+      <mat-icon>admin_panel_settings</mat-icon>
+      <div class="title-text">
+        <span class="overline">Centro de Control</span>
+        <h1>Gobernanza y Seguridad</h1>
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <button mat-stroked-button color="primary">
+        <mat-icon>download</mat-icon>
+        Exportar Reporte
+      </button>
+      <button mat-flat-button color="accent">
+        <mat-icon>add</mat-icon>
+        Nuevo Rol
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<div class="admin-container">
+  <section class="kpi-grid">
+    <mat-card class="kpi-card" *ngFor="let kpi of kpis(); let idx = index" [style.animation-delay.ms]="idx * 120">
+      <div class="kpi-icon">
+        <mat-icon>{{ kpi.icon }}</mat-icon>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">{{ kpi.label }}</span>
+        <span class="kpi-value">{{ kpi.value | number }}</span>
+      </div>
+      <div class="kpi-variation" [class.positive]="kpi.variation >= 0" [class.negative]="kpi.variation < 0">
+        <mat-icon>{{ kpi.variation >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <span>{{ formatVariation(kpi.variation) }}</span>
+      </div>
+    </mat-card>
+  </section>
+
+  <section class="summary-grid">
+    <mat-card class="summary-card span-2">
+      <mat-card-header>
+        <div mat-card-avatar class="header-icon gradient-blue">
+          <mat-icon>gpp_good</mat-icon>
+        </div>
+        <mat-card-title>Postura de Seguridad</mat-card-title>
+        <mat-card-subtitle>Resumen actualizado</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="compliance">
+          <div class="score">
+            <span class="score-value">{{ securitySnapshot().compliance }}%</span>
+            <span class="score-label">Cumplimiento general</span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="securitySnapshot().compliance"></mat-progress-bar>
+          <div class="compliance-meta">
+            <div>
+              <span class="meta-label">Incidentes abiertos</span>
+              <span class="meta-value">{{ securitySnapshot().incidents }}</span>
+            </div>
+            <div>
+              <span class="meta-label">Última auditoría</span>
+              <span class="meta-value">{{ securitySnapshot().lastAudit }}</span>
+            </div>
+            <div>
+              <span class="meta-label">Próxima revisión</span>
+              <span class="meta-value">{{ securitySnapshot().nextAudit }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <div mat-card-avatar class="header-icon gradient-green">
+          <mat-icon>verified</mat-icon>
+        </div>
+        <mat-card-title>Gobernanza</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="governance-score">
+          <span class="score-value">{{ governanceScore() }} / 100</span>
+          <span class="score-label">Índice de madurez</span>
+        </div>
+        <mat-divider></mat-divider>
+        <ul class="score-breakdown">
+          <li>
+            <mat-icon color="primary">task_alt</mat-icon>
+            Matriz de roles y permisos al día
+          </li>
+          <li>
+            <mat-icon color="primary">insights</mat-icon>
+            KPIs de desempeño revisados esta semana
+          </li>
+          <li>
+            <mat-icon color="primary">policy</mat-icon>
+            Políticas críticas validadas en los últimos 30 días
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <div mat-card-avatar class="header-icon gradient-orange">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <mat-card-title>Bitácora reciente</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list class="audit-list">
+          <mat-list-item *ngFor="let event of auditTrail()">
+            <div matListItemTitle>{{ event.action }}</div>
+            <div matListItemLine>{{ event.module }} • {{ event.user }}</div>
+            <div matListItemMeta>
+              <span class="meta-time">{{ event.timestamp }}</span>
+              <span class="severity-chip" [class.high]="event.severity === 'alta'" [class.medium]="event.severity === 'media'">
+                {{ severityLabel(event.severity) }}
+              </span>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section class="roles-section">
+    <div class="section-header">
+      <div>
+        <h2>Roles y permisos</h2>
+        <span class="subtitle">Monitorea accesos a módulos críticos</span>
+      </div>
+      <div class="header-actions">
+        <mat-chip-set class="status-chips">
+          <mat-chip selected color="primary">Todos</mat-chip>
+          <mat-chip>Activos</mat-chip>
+          <mat-chip>En revisión</mat-chip>
+          <mat-chip>Restringidos</mat-chip>
+        </mat-chip-set>
+        <button mat-stroked-button>
+          <mat-icon>tune</mat-icon>
+          Configurar vista
+        </button>
+      </div>
+    </div>
+
+    <mat-card class="roles-card">
+      <table mat-table [dataSource]="roles()" class="roles-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Rol</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="role-name">{{ row.name }}</div>
+            <div class="role-perms">{{ row.permissions.join(' • ') }}</div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="users">
+          <th mat-header-cell *matHeaderCellDef>Usuarios</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge">{{ row.users }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-chip" [class.active]="row.status === 'activo'" [class.review]="row.status === 'revision'" [class.blocked]="row.status === 'suspendido'">
+              {{ statusLabel(row.status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Ver bitácora">
+              <mat-icon>history</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Más opciones">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['name', 'users', 'status', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['name', 'users', 'status', 'actions'];"></tr>
+      </table>
+    </mat-card>
+  </section>
+
+  <section class="governance-grid">
+    <mat-card class="policy-card">
+      <div class="card-header">
+        <h3>Políticas y controles</h3>
+        <button mat-icon-button matTooltip="Editar políticas">
+          <mat-icon>manage_accounts</mat-icon>
+        </button>
+      </div>
+      <div class="policy-list">
+        <div class="policy-item" *ngFor="let policy of policies()">
+          <div class="policy-info">
+            <h4>{{ policy.name }}</h4>
+            <p>{{ policy.description }}</p>
+            <span class="meta">Última revisión: {{ policy.lastReview }}</span>
+          </div>
+          <mat-slide-toggle [checked]="policy.enabled"></mat-slide-toggle>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="approvals-card">
+      <div class="card-header">
+        <h3>Solicitudes pendientes</h3>
+        <button mat-stroked-button color="primary">Ver historial</button>
+      </div>
+      <mat-list>
+        <mat-list-item *ngFor="let approval of approvals()">
+          <div matListItemTitle>{{ approval.title }}</div>
+          <div matListItemLine>{{ approval.requester }} • {{ approval.detail }}</div>
+          <div matListItemMeta>{{ approval.submittedAt }}</div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card>
+
+    <mat-card class="tasks-card">
+      <div class="card-header">
+        <h3>Próximas acciones</h3>
+        <button mat-icon-button matTooltip="Añadir tarea">
+          <mat-icon>add_task</mat-icon>
+        </button>
+      </div>
+      <div class="task-list">
+        <div class="task-item" *ngFor="let task of tasks()">
+          <div class="task-info">
+            <h4>{{ task.title }}</h4>
+            <span class="meta">Responsable: {{ task.owner }}</span>
+            <span class="meta">Fecha límite: {{ task.deadline }}</span>
+          </div>
+          <div class="task-progress">
+            <span>{{ task.progress }}%</span>
+            <mat-progress-bar mode="determinate" [value]="task.progress"></mat-progress-bar>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </section>
+</div>
