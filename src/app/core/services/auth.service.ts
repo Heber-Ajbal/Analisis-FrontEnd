@@ -8,8 +8,16 @@ export type Role = 'cliente' | 'admin_empresa';
 export type Tipo = 'cliente' | 'empresa';
 export interface User { email:string; role:Role; type:Tipo; approved?:boolean; }
 
+export interface AuthSessionUser {
+  id: number;
+  email: string;
+  username?: string;
+  role?: unknown;
+  [key: string]: unknown;
+}
+
 type LoginPayload = { identifier: string; password: string; captchaToken?: string };
-type LoginResponse = { jwt: string; user: any };             // lo que muestra tu captura
+type LoginResponse = { jwt: string; user: AuthSessionUser | null | undefined };             // lo que muestra tu captura
 type MeResponse = {
   id: number;
   email: string;
@@ -26,16 +34,53 @@ export class AuthService {
   private http = inject(HttpClient);
   private API = environment.apiBaseUrl; // ej. http://localhost:1337
   private ACCESS_KEY = 'app:jwt';
+  private USER_KEY = 'app:user';
+
+  private get storage(): Storage | null {
+    try {
+      return typeof localStorage === 'undefined' ? null : localStorage;
+    } catch {
+      return null;
+    }
+  }
 
   // === token ===
-  get token(): string | null { return localStorage.getItem(this.ACCESS_KEY); }
+  get token(): string | null {
+    return this.storage?.getItem(this.ACCESS_KEY) ?? null;
+  }
+
   private set token(v: string | null) {
-    if (v) localStorage.setItem(this.ACCESS_KEY, v);
-    else localStorage.removeItem(this.ACCESS_KEY);
+    const storage = this.storage;
+    if (!storage) return;
+    if (v) storage.setItem(this.ACCESS_KEY, v);
+    else storage.removeItem(this.ACCESS_KEY);
+  }
+
+  get currentUser(): AuthSessionUser | null {
+    const storage = this.storage;
+    if (!storage) return null;
+    const raw = storage.getItem(this.USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as AuthSessionUser;
+    } catch {
+      return null;
+    }
+  }
+
+  get currentUserId(): number | null {
+    return this.currentUser?.id ?? null;
+  }
+
+  private setCurrentUser(user: AuthSessionUser | null | undefined) {
+    const storage = this.storage;
+    if (!storage) return;
+    if (user) storage.setItem(this.USER_KEY, JSON.stringify(user));
+    else storage.removeItem(this.USER_KEY);
   }
 
   isLoggedIn() { return !!this.token; }
-  logout()     { this.token = null; }
+  logout()     { this.token = null; this.setCurrentUser(null); }
 
   async login(email: string, password: string, captchaToken?: string): Promise<void> {
     const body: LoginPayload = { identifier: email, password };
@@ -44,6 +89,7 @@ export class AuthService {
       this.http.post<LoginResponse>(`${this.API}/auth/new-local`, body)
     );
     if (!res?.jwt) throw new Error('Login sin token');
-    this.token = res.jwt; 
+    this.token = res.jwt;
+    this.setCurrentUser(res.user ?? null);
   }
 }

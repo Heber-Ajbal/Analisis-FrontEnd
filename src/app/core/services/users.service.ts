@@ -67,4 +67,17 @@ export class UsersService {
 
     return mapUserApiToUser(res);
   }
+
+  async findById(id: number | string): Promise<User> {
+    const res = await firstValueFrom(
+      this.http.get<UserApi | { data: UserApi }>(`${this.API}/users/${id}`)
+    );
+
+    const item = (res as any)?.data ?? res;
+    if (!item) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    return mapUserApiToUser(item as UserApi);
+  }
 }

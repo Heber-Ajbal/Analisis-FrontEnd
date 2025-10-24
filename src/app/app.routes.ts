@@ -9,6 +9,7 @@ import { HomeComponent }     from './features/home/home.component';
 import { AdminComponent }    from './features/admin/admin.component';
 import { CatalogComponent } from './features/catalog/catalog.component';
 import { CartComponent } from './features/cart/cart.component';
+import { ProfileComponent } from './features/profile/profile.component';
 
 //ADMIN
 import { DashboardComponent } from './features/dashboard/dashboard.component';
@@ -37,6 +38,7 @@ export const routes: Routes = [
       { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
       { path: 'catalogo', component: CatalogComponent },
       { path: 'carrito', component: CartComponent },
+      { path: 'perfil', component: ProfileComponent, canActivate: [authGuard] },
 
       { path: 'dashboard', component: DashboardComponent },
       {
