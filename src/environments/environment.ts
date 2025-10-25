@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:1337/api', // ajusta a tu backend
-  strapiToken: '5225bfb98bab181b136c1026a84bda8839e0014a23acecf773bf55121def3658cd4ccb767617944dc63f398325a827dfffe7fcea999a11f3552f091be54eed9763892a230951a2006ce6234f6d3e9e00390ec4c59f2808f84645baeeb32235677dd08a1a128c0bec21a67a5cc7307a89654081237199fbcfd0c19e65185464b0',
+  strapiToken: '10b51ff621a990dff6fc5eb3f6ee2836c84e93a2f95e47aae5bf463de8dbba3124704a5d0d48ef6435464b7bb85a83014bb30d80986bf69b54ebe8a150173f0c16124c006f27670122ececf104df59b4a1f0ea493bb34a108df045c5d4307cc0239d21614a655286d04fdc71e96fdd203e5501e49a2ca9ae1effa1df5ba0cfcb',
   recaptchaSiteKey: 'REEMPLAZA_CON_TU_SITE_KEY',
   /**
    * Clave usada únicamente durante el desarrollo local.

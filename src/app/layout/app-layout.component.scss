@@ -1,7 +1,9 @@
 .shell   { height: 100dvh; background:#fff; }
+.topbar  { position: sticky; top: 0; z-index: 10; }
+.brand   { font-weight: 600; letter-spacing:.2px; }
 .sidenav { border-right: 1px solid rgba(0,0,0,.08); background:#fff; }
 .content { height: 100dvh; display:flex; flex-direction:column; }
-.page    { flex:1 1 auto; overflow:auto; padding: 16px; }
+.page    { flex:1 1 auto; overflow:auto; padding: 16px; max-width:1280px; margin:0 auto; }
 
 .menu { display:flex; flex-direction:column; height:100%; padding:.5rem; gap:.25rem; }
 .menu.collapsed .label { display:none; }
@@ -15,3 +17,8 @@
 .menu-item.active, .menu-item:hover { background:#f3f4f6; }
 .divider { height:1px; background:rgba(0,0,0,.08); margin:.5rem 0; }
 .spacer  { flex:1 1 auto; }
+
+.hide-handset { display:inline; }
+@media (max-width: 599px) {
+  .hide-handset { display:none; }
+}

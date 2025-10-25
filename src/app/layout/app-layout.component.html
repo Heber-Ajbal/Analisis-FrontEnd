@@ -1,120 +1,155 @@
 <mat-sidenav-container class="shell">
 
+  <!-- TOPBAR -->
+  <mat-toolbar color="primary" class="topbar">
+    <button mat-icon-button (click)="drawer.toggle()" *ngIf="(isHandset$ | async)">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span class="brand">APP</span>
+    <span class="spacer"></span>
+
+    <button *ngIf="loggedIn" mat-button routerLink="/perfil">
+      <mat-icon>person</mat-icon>
+      <span class="hide-handset">Perfil</span>
+    </button>
+    <button *ngIf="loggedIn" mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span class="hide-handset">Salir</span>
+    </button>
+    <button *ngIf="!loggedIn" mat-stroked-button routerLink="/login">
+      <mat-icon>login</mat-icon>
+      <span class="hide-handset">Ingresar</span>
+    </button>
+  </mat-toolbar>
+
+  <!-- SIDENAV -->
   <mat-sidenav
-    mode="side"
-    opened
+    #drawer
     class="sidenav"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) ? false : true"
+    [fixedInViewport]="(isHandset$ | async)"
+    [fixedTopGap]="64"
     [style.width.px]="collapsed ? 72 : 240">
 
     <div class="menu" [class.collapsed]="collapsed">
 
+      <!-- fila de colapso -->
       <div class="collapse-row" [class.collapsed]="collapsed">
         <button
           mat-icon-button
           class="collapse-btn"
           (click)="toggle()"
           [attr.aria-expanded]="!collapsed"
-          [matTooltip]="collapsed ? 'Expandir menú' : 'Contraer menú'">
+          [matTooltip]="collapsed ? 'Expandir menú' : ''"
+          [matTooltipDisabled]="!collapsed">
           <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
         </button>
         <span class="collapse-text" [class.hide]="collapsed">APP</span>
       </div>
 
-      <a class="menu-item" matRipple routerLink="/home" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Inicio' : ''" matTooltipPosition="right">
+      <!-- navegación -->
+      <a class="menu-item" matRipple routerLink="/home"
+         routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"
+         [matTooltip]="collapsed ? 'Inicio' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
         <mat-icon>home</mat-icon>
-        <span class="label">Inicio</span>
+        <span class="label" [class.hide]="collapsed">Inicio</span>
       </a>
 
-      <a class="menu-item" matRipple routerLink="/revision" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Buscar' : ''" matTooltipPosition="right">
+      <!-- 🔧 Buscar -> /catalogo -->
+      <a class="menu-item" matRipple routerLink="/catalogo" routerLinkActive="active"
+         [matTooltip]="collapsed ? 'Buscar' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
         <mat-icon>search</mat-icon>
-        <span class="label">Buscar</span>
+        <span class="label" [class.hide]="collapsed">Buscar</span>
       </a>
 
       <a class="menu-item" matRipple routerLink="/carrito" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Carrito' : ''" matTooltipPosition="right">
+         [matTooltip]="collapsed ? 'Carrito' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
         <mat-icon>shopping_cart</mat-icon>
-        <span class="label">Carrito</span>
+        <span class="label" [class.hide]="collapsed">Carrito</span>
       </a>
 
       <a class="menu-item" matRipple routerLink="/admin" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Alertas' : ''" matTooltipPosition="right">
+         [matTooltip]="collapsed ? 'Alertas' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
         <mat-icon>notifications</mat-icon>
-        <span class="label">Alertas</span>
+        <span class="label" [class.hide]="collapsed">Alertas</span>
       </a>
 
       <div class="divider"></div>
 
-      <!-- Mostrar SOLO si NO está logueado -->
+      <!-- NO logueado -->
       <ng-container *ngIf="!loggedIn">
         <a class="menu-item" matRipple routerLink="/login" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Login' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Login' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>login</mat-icon>
-          <span class="label">Login</span>
+          <span class="label" [class.hide]="collapsed">Login</span>
         </a>
 
         <a class="menu-item" matRipple routerLink="/registro" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Registro' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Registro' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>person_add</mat-icon>
-          <span class="label">Registro</span>
+          <span class="label" [class.hide]="collapsed">Registro</span>
         </a>
       </ng-container>
 
+      <!-- SÍ logueado -->
       <ng-container *ngIf="loggedIn">
         <a class="menu-item" matRipple routerLink="/dashboard" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Dashboard' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Dashboard' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>dashboard</mat-icon>
-          <span class="label">Dashboard</span>
+          <span class="label" [class.hide]="collapsed">Dashboard</span>
         </a>
 
         <a class="menu-item" matRipple routerLink="/inventario" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Inventario' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Inventario' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>inventory_2</mat-icon>
-          <span class="label">Inventario</span>
+          <span class="label" [class.hide]="collapsed">Inventario</span>
         </a>
 
         <a class="menu-item" matRipple routerLink="/publicidad" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Publicidad' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Publicidad' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>campaign</mat-icon>
-          <span class="label">Publicidad</span>
+          <span class="label" [class.hide]="collapsed">Publicidad</span>
         </a>
 
         <a class="menu-item" matRipple routerLink="/compras" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Compras' : ''" matTooltipPosition="right">
+           [matTooltip]="collapsed ? 'Compras' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
           <mat-icon>shopping_bag</mat-icon>
-          <span class="label">Compras</span>
+          <span class="label" [class.hide]="collapsed">Compras</span>
         </a>
 
         <a class="menu-item" matRipple routerLink="/usuarios" routerLinkActive="active"
-           [matTooltip]="collapsed ? 'Usuarios' : ''" matTooltipPosition="right">
-          <mat-icon>user</mat-icon>
-          <span class="label">Usuario</span>
+           [matTooltip]="collapsed ? 'Usuarios' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
+          <mat-icon>person</mat-icon>
+          <span class="label" [class.hide]="collapsed">Usuario</span>
         </a>
       </ng-container>
 
       <div class="spacer"></div>
 
-      <!-- Perfil y Logout: SOLO si está logueado -->
+      <!-- Pie -->
       <a *ngIf="loggedIn" class="menu-item" matRipple routerLink="/perfil" routerLinkActive="active"
-         [matTooltip]="collapsed ? 'Perfil' : ''" matTooltipPosition="right">
+         [matTooltip]="collapsed ? 'Perfil' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right">
         <mat-icon>person</mat-icon>
-        <span class="label">Perfil</span>
+        <span class="label" [class.hide]="collapsed">Perfil</span>
       </a>
 
       <button *ngIf="loggedIn" type="button" class="menu-item" matRipple
-              [matTooltip]="collapsed ? 'Cerrar sesión' : ''" matTooltipPosition="right"
+              [matTooltip]="collapsed ? 'Cerrar sesión' : ''" [matTooltipDisabled]="!collapsed" matTooltipPosition="right"
               (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span class="label">Cerrar sesión</span>
+        <span class="label" [class.hide]="collapsed">Cerrar sesión</span>
       </button>
 
     </div>
   </mat-sidenav>
 
+  <!-- CONTENIDO -->
   <mat-sidenav-content class="content">
     <div class="page">
       <router-outlet></router-outlet>
     </div>
   </mat-sidenav-content>
+
 </mat-sidenav-container>

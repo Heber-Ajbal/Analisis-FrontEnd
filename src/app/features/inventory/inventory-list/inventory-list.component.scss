@@ -5,19 +5,19 @@
   min-height: 100%;
 }
 
+/* ── TOOLBAR ───────────────────────────────────────────────────────────────── */
 .toolbar.luxe {
   --toolbar-h: 64px;
   height: var(--toolbar-h);
   padding: 0 12px;
   background: var(--mat-toolbar-container-background);
   border-bottom: 1px solid rgba(0,0,0,.06);
-}
-
-.brand {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
+.brand { display: flex; align-items: center; gap: 12px; }
 .brand mat-icon { font-size: 26px; width: 26px; height: 26px; }
 .brand-col { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-col .title { font-weight: 600; }
@@ -30,10 +30,30 @@
   align-items: center;
   gap: 12px;
 }
-.toolbar-search .field { width: 320px; }
+
+/* 🔧 Arreglo de superposición del buscador en la toolbar */
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* fija ancho y evita que "flote" sobre otros elementos */
+  max-width: 420px;
+  width: 100%;
+}
+.toolbar-search .field {
+  width: 100%;
+  margin: 0;
+}
+.toolbar-search .mat-mdc-form-field-infix { /* quita “saltos raros” del input */
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.toolbar-search .mat-mdc-form-field-subscript-wrapper { display: none; }
+
 .xs-hide { display: block; }
 .sm-only { display: none; }
 
+/* ── PAGE / CARDS ─────────────────────────────────────────────────────────── */
 .page { margin-top: 16px; display: grid; gap: 16px; }
 .card { border-radius: 14px; overflow: hidden; }
 
@@ -51,6 +71,7 @@
 .chips { margin-top: 6px; }
 .chip { --mdc-chip-container-shape: 999px; }
 
+/* ── TABLA ────────────────────────────────────────────────────────────────── */
 .table-card { padding: 0; }
 .table-wrap { overflow-x: auto; min-height: 180px; }
 
@@ -135,6 +156,7 @@ table.luxe-table { width: 100%; border-collapse: collapse; }
 
 .loading-row { opacity: .45; pointer-events: none; }
 
+/* Skeleton */
 .skeleton-row .cell,
 .skeleton,
 .thumb.skeleton,
@@ -157,8 +179,9 @@ table.luxe-table { width: 100%; border-collapse: collapse; }
   100% { transform: translateX(100%); }
 }
 
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
 @media (max-width: 960px) {
-  .toolbar-search .field { width: 220px; }
+  .toolbar-search { max-width: 300px; }
 }
 @media (max-width: 720px) {
   .xs-hide { display: none; }
@@ -166,6 +189,8 @@ table.luxe-table { width: 100%; border-collapse: collapse; }
   :host { padding: 16px; }
   .brand-col .hint { display: none; }
 }
+
+/* Dark mode */
 :host-context(.dark-theme) {
   .table-empty { color: rgba(255,255,255,.7); }
   .luxe-table thead th { background: rgba(255,255,255,.06); color: rgba(255,255,255,.8); }

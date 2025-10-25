@@ -36,24 +36,9 @@ export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
 
   shippingOptions: ShippingOption[] = [
-    {
-      id: 'standard',
-      label: 'Envío estándar',
-      description: 'Entrega en 3-5 días hábiles',
-      cost: 35,
-    },
-    {
-      id: 'express',
-      label: 'Entrega express',
-      description: 'Entrega al siguiente día hábil',
-      cost: 95,
-    },
-    {
-      id: 'pickup',
-      label: 'Recoger en tienda',
-      description: 'Disponible en bodegas zona 9',
-      cost: 0,
-    },
+    { id: 'standard', label: 'Envío estándar', description: 'Entrega en 3-5 días hábiles', cost: 35 },
+    { id: 'express',  label: 'Entrega express', description: 'Entrega al siguiente día hábil', cost: 95 },
+    { id: 'pickup',   label: 'Recoger en tienda', description: 'Disponible en bodegas zona 9', cost: 0 },
   ];
 
   selectedShipping = this.shippingOptions[0];
@@ -88,18 +73,12 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService
       .getCartItems()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((items) => {
-        this.cartItems = items;
-      });
+      .subscribe((items) => { this.cartItems = items; });
 
     this.cartService
       .getSelectedShipping()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((shipping) => {
-        if (shipping) {
-          this.selectedShipping = shipping;
-        }
-      });
+      .subscribe((shipping) => { if (shipping) this.selectedShipping = shipping; });
 
     this.cartService
       .getAppliedCoupon()
@@ -112,22 +91,15 @@ export class CartComponent implements OnInit, OnDestroy {
           this.couponSuccess = true;
         } else {
           this.couponSuccess = false;
-          if (!this.couponCode) {
-            this.couponMessage = 'Ingresa un código para aplicar un descuento.';
-          }
+          if (!this.couponCode) this.couponMessage = 'Ingresa un código para aplicar un descuento.';
         }
       });
 
     const state = this.cartService.getCurrentCartState();
-    if (!state.shipping) {
-      this.cartService.setSelectedShipping(this.selectedShipping);
-    } else {
-      this.selectedShipping = state.shipping;
-    }
+    if (!state.shipping) this.cartService.setSelectedShipping(this.selectedShipping);
+    else this.selectedShipping = state.shipping;
 
-    if (state.coupon) {
-      this.cartService.setAppliedCoupon(state.coupon);
-    }
+    if (state.coupon) this.cartService.setAppliedCoupon(state.coupon);
   }
 
   get subtotal(): number {
@@ -135,9 +107,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get discount(): number {
-    if (this.appliedCoupon === 'AHORRA10') {
-      return Math.min(this.subtotal * 0.1, 50);
-    }
+    if (this.appliedCoupon === 'AHORRA10') return Math.min(this.subtotal * 0.1, 50);
     return 0;
   }
 
@@ -168,7 +138,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   applyCoupon(): void {
     const normalized = this.couponCode.trim().toUpperCase();
-
     if (!normalized) {
       this.appliedCoupon = null;
       this.couponMessage = 'Ingresa un código para aplicar un descuento.';
@@ -200,12 +169,9 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   proceedToCheckout(): void {
-    // Guardar estado actual en el servicio
     this.cartService.setCartItems(this.cartItems);
     this.cartService.setSelectedShipping(this.selectedShipping);
     this.cartService.setAppliedCoupon(this.appliedCoupon);
-
-    // Mostrar formulario de pago
     this.showPaymentForm = true;
   }
 
@@ -237,10 +203,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
     console.log('Orden procesada:', orderData);
 
-    // Aquí iría la llamada al backend para procesar el pago
-    // this.checkoutService.processOrder(orderData).subscribe(...)
-
-    // Por ahora, mostrar confirmación y limpiar
     alert(`✓ Pago procesado exitosamente!\nTotal: Q${this.total.toFixed(2)}`);
     this.clearCart();
     this.showPaymentForm = false;
@@ -255,19 +217,11 @@ export class CartComponent implements OnInit, OnDestroy {
 
   getErrorMessage(fieldName: string): string {
     const control = this.paymentForm.get(fieldName);
-    if (!control || !control.errors || !control.touched) {
-      return '';
-    }
+    if (!control || !control.errors || !control.touched) return '';
 
-    if (control.errors['required']) {
-      return 'Este campo es requerido';
-    }
-    if (control.errors['minlength']) {
-      return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
-    }
-    if (control.errors['email']) {
-      return 'Email no válido';
-    }
+    if (control.errors['required']) return 'Este campo es requerido';
+    if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
+    if (control.errors['email']) return 'Email no válido';
     if (control.errors['pattern']) {
       if (fieldName === 'phone') return 'Debe ser 8 dígitos';
       if (fieldName === 'postalCode') return 'Debe ser 5 dígitos';

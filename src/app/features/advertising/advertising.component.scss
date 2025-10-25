@@ -417,3 +417,33 @@
     animation: none;
   }
 }
+
+
+
+/* --- Arreglos anti-traslape ---------------------------------------------- */
+
+/* 1) No escalar las cards al hacer hover (solo un levísimo translate) */
+.summary-card:hover       { transform: translateY(-2px); }
+.toolbar:hover            { transform: translateY(-1px); }
+
+/* En las campaign cards, evita el scale; sube z-index por si la sombra cruza */
+.campaign-card            { position: relative; z-index: 0; }
+.campaign-card:hover      {
+  transform: translateY(-4px);   /* antes: translateY(-6px) scale(1.02) */
+  z-index: 5;
+}
+
+/* 2) Que el grid estire uniformemente las alturas (nada de “montañitas”) */
+.campaign-grid            { align-items: stretch; }
+
+/* 3) Toolbar: permitir wrap en medios anchos y que no se pisen */
+.toolbar                  { flex-wrap: wrap; gap: 16px; }
+.toolbar-main             { flex: 1 1 520px; min-width: 280px; }
+.toolbar-actions          { flex: 0 0 auto; }
+
+/* 4) Evitar desbordes de texto en títulos largos */
+.title .heading           { min-width: 0; }
+.title .heading h1        { white-space: normal; word-break: break-word; }
+
+/* 5) Asegurar caja consistente (por si estilos globales no lo tienen) */
+:host, :host *            { box-sizing: border-box; }

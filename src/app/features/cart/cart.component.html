@@ -1,5 +1,5 @@
 <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-  <!-- CARRITO NORMAL -->
+  <!-- ================== CARRITO NORMAL ================== -->
   <ng-container *ngIf="!showPaymentForm">
     <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
       <div>
@@ -28,6 +28,7 @@
     </header>
 
     <div class="grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <!-- ========== LISTA DE PRODUCTOS ========== -->
       <section class="space-y-4" aria-label="Resumen de productos en el carrito">
         <ng-container *ngIf="cartItems.length; else emptyState">
           <mat-card *ngFor="let item of cartItems; trackBy: trackById" class="rounded-2xl shadow-sm border border-gray-100">
@@ -79,7 +80,8 @@
                     <span class="text-xs text-gray-500">{{ item.stock }} disponibles</span>
                   </div>
 
-                  <div class="text-right">
+                  <!-- texto compacto para evitar saltos extra -->
+                  <div class="text-right leading-tight">
                     <p class="text-sm text-gray-500">Precio unitario</p>
                     <p class="text-xl font-bold text-gray-900">
                       {{ item.price | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
@@ -95,7 +97,9 @@
         </ng-container>
       </section>
 
+      <!-- ========== ASIDE: RESUMEN / ENVÍO / CUPÓN ========== -->
       <aside class="space-y-4" aria-label="Acciones del carrito">
+        <!-- RESUMEN -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100">
           <mat-card-content class="space-y-4">
             <div class="flex items-baseline justify-between">
@@ -135,6 +139,7 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- MÉTODO DE ENVÍO (sin solapes) -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100">
           <mat-card-content class="space-y-4">
             <h3 class="text-base font-semibold text-gray-900">Método de envío</h3>
@@ -142,24 +147,27 @@
               <button
                 mat-stroked-button
                 *ngFor="let option of shippingOptions"
-                class="w-full justify-between !py-4"
+                class="w-full !p-0"
                 [color]="option.id === selectedShipping.id ? 'primary' : undefined"
                 [class.bg-blue-50]="option.id === selectedShipping.id"
                 (click)="selectShipping(option)"
                 type="button"
               >
-                <span class="text-left">
-                  <span class="block font-medium">{{ option.label }}</span>
-                  <span class="block text-xs text-gray-500">{{ option.description }}</span>
-                </span>
-                <span class="font-semibold">
-                  {{ option.cost | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+                <span class="w-full flex items-start justify-between gap-3 py-3">
+                  <span class="text-left leading-tight">
+                    <span class="block font-medium">{{ option.label }}</span>
+                    <span class="block text-xs text-gray-500">{{ option.description }}</span>
+                  </span>
+                  <span class="font-semibold whitespace-nowrap">
+                    {{ option.cost | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}
+                  </span>
                 </span>
               </button>
             </div>
           </mat-card-content>
         </mat-card>
 
+        <!-- CUPÓN -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100">
           <mat-card-content class="space-y-3">
             <h3 class="text-base font-semibold text-gray-900">Cupón de descuento</h3>
@@ -184,7 +192,7 @@
     </div>
   </ng-container>
 
-  <!-- FORMULARIO DE PAGO -->
+  <!-- ================== FORMULARIO DE PAGO ================== -->
   <ng-container *ngIf="showPaymentForm">
     <div class="max-w-2xl mx-auto">
       <div class="mb-6">
@@ -196,7 +204,7 @@
       </div>
 
       <form [formGroup]="paymentForm" class="space-y-6">
-        <!-- SECCIÓN: DATOS DE FACTURACIÓN -->
+        <!-- FACTURACIÓN -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100">
           <mat-card-header class="bg-gray-50 border-b">
             <mat-card-title class="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -257,7 +265,7 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- SECCIÓN: DATOS DE TARJETA -->
+        <!-- TARJETA -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100">
           <mat-card-header class="bg-gray-50 border-b">
             <mat-card-title class="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -303,7 +311,7 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- RESUMEN DEL PEDIDO -->
+        <!-- RESUMEN PAGO -->
         <mat-card class="rounded-2xl shadow-sm border border-gray-100 bg-blue-50">
           <mat-card-content class="space-y-3 pt-6">
             <h3 class="text-lg font-semibold text-gray-900">Resumen del pedido</h3>
@@ -312,7 +320,7 @@
                 <span class="text-gray-600">{{ totalUnits }} producto(s)</span>
                 <span class="font-medium">{{ subtotal | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
               </div>
-              <div class="flex justify-between" *ngIf="discount > 0" class="text-green-600">
+              <div class="flex justify-between" *ngIf="discount > 0">
                 <span>Descuento</span>
                 <span>-{{ discount | currency : 'GTQ' : 'symbol-narrow' : '1.2-2' }}</span>
               </div>
@@ -329,14 +337,9 @@
           </mat-card-content>
         </mat-card>
 
-        <!-- BOTONES DE ACCIÓN -->
+        <!-- ACCIONES -->
         <div class="flex gap-3">
-          <button
-            mat-stroked-button
-            class="flex-1 h-12 text-base"
-            (click)="cancelPayment()"
-            type="button"
-          >
+          <button mat-stroked-button class="flex-1 h-12 text-base" (click)="cancelPayment()" type="button">
             <mat-icon class="mr-2">close</mat-icon>
             Cancelar
           </button>
@@ -356,11 +359,12 @@
     </div>
   </ng-container>
 
-  <!-- CARRITO VACÍO -->
+  <!-- ================== CARRITO VACÍO ================== -->
   <ng-template #emptyState>
     <mat-card class="rounded-2xl border border-dashed border-gray-200 bg-gray-50">
       <mat-card-content class="flex flex-col items-center gap-4 py-12">
-        <mat-icon fontSet="material-icons-outlined" class="text-4xl text-gray-400">shopping_cart</mat-icon>
+        <!-- usar set baseline para evitar el “cl” -->
+        <mat-icon class="text-4xl text-gray-400">shopping_cart</mat-icon>
         <div class="text-center space-y-2">
           <h2 class="text-xl font-semibold text-gray-900">Tu carrito está vacío</h2>
           <p class="text-sm text-gray-500">Explora el catálogo y agrega repuestos para continuar con la compra.</p>

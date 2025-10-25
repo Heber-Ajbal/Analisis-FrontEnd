@@ -13,7 +13,8 @@ type ProductsResponse = {
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
   private http = inject(HttpClient);
-  private API = environment.apiBaseUrl; // p.ej. http://localhost:1337
+  // p.ej. http://localhost:1337/api  (con /api)
+  private API = environment.apiBaseUrl;
 
   /**
    * Server-side filters (Strapi):
@@ -21,8 +22,9 @@ export class InventoryService {
    * - categoria: por type
    * - page, pageSize: paginación
    */
-  async list(opts: { q?: string; categoria?: string | null; page?: number; pageSize?: number } = {})
-  : Promise<{ rows: Product[]; total: number; page: number; pageSize: number; pageCount: number }> {
+  async list(
+    opts: { q?: string; categoria?: string | null; page?: number; pageSize?: number } = {}
+  ): Promise<{ rows: Product[]; total: number; page: number; pageSize: number; pageCount: number }> {
     let params = new HttpParams();
 
     // Búsqueda (containsi en name/code)
@@ -33,15 +35,18 @@ export class InventoryService {
     }
 
     // Filtro por categoría (type)
-    if (opts.categoria) params = params.set('filters[type][$eq]', opts.categoria);
+    if (opts.categoria) params = params.set('filters[type][$eq]', String(opts.categoria));
 
     // Paginación
     const page = opts.page ?? 1;
     const pageSize = opts.pageSize ?? 25;
+
     params = params
       .set('pagination[page]', page)
       .set('pagination[pageSize]', pageSize)
-      .set('sort', 'createdAt:desc');
+      .set('sort', 'createdAt:desc')
+      // 👇 IMPORTANTE: trae la media para poder construir imagenUrl
+      .set('populate', 'referenceImage');
 
     const res = await firstValueFrom(
       this.http.get<ProductsResponse>(`${this.API}/products`, { params })
@@ -69,22 +74,29 @@ export class InventoryService {
         retailPrice: p.precio,
         type: p.categoria ?? undefined,
         description: p.description ?? undefined,
-      }
+      },
     };
+
     const res = await firstValueFrom(
-      this.http.post<{ data: ProductApi }>(`${this.API}/products`, body)
+      this.http.post<{ data: ProductApi }>(`${this.API}/products`, body, {
+        params: new HttpParams().set('populate', 'referenceImage'),
+      })
     );
+
     return mapApiToProduct(res.data);
   }
 
-  async update(id: number | string, p: {
-    sku: string;
-    nombre: string;
-    categoria: string | null;
-    proveedor: string | null;
-    precio: number;
-    description?: string | null;
-  }): Promise<Product> {
+  async update(
+    id: number | string,
+    p: {
+      sku: string;
+      nombre: string;
+      categoria: string | null;
+      proveedor: string | null;
+      precio: number;
+      description?: string | null;
+    }
+  ): Promise<Product> {
     const body = {
       data: {
         code: p.sku,
@@ -93,11 +105,15 @@ export class InventoryService {
         retailPrice: p.precio,
         type: p.categoria ?? undefined,
         description: p.description ?? undefined,
-      }
+      },
     };
+
     const res = await firstValueFrom(
-      this.http.put<{ data: ProductApi }>(`${this.API}/products/${id}`, body)
+      this.http.put<{ data: ProductApi }>(`${this.API}/products/${id}`, body, {
+        params: new HttpParams().set('populate', 'referenceImage'),
+      })
     );
+
     return mapApiToProduct(res.data);
   }
 }

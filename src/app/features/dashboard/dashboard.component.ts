@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Angular Material
+/* Angular Material */
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,10 +11,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 
-// Charts (usa una de estas 2 líneas según tu versión)
-import { BaseChartDirective } from 'ng2-charts';      // ✅ standalone (moderno)
-// import { NgChartsModule } from 'ng2-charts';       // ✅ alternativa con módulo
-
+/* Charts (standalone) */
+import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
 @Component({
@@ -22,20 +20,18 @@ import { ChartConfiguration, ChartType } from 'chart.js';
   standalone: true,
   imports: [
     CommonModule,
-    // Material
     MatToolbarModule, MatIconModule, MatButtonModule, MatMenuModule,
     MatCardModule, MatDividerModule, MatTableModule, MatChipsModule,
-    // Charts
-    BaseChartDirective, // o NgChartsModule si usas módulo
+    BaseChartDirective
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  // Filtro mock
-  rango = signal<'7d'|'30d'|'ytd'|'12m'>('30d');
+  /* Filtro mock */
+  rango = signal<'7d' | '30d' | 'ytd' | '12m'>('30d');
 
-  // KPIs
+  /* KPIs */
   kpis = [
     { label: 'Productos',    value: 248,  icon: 'inventory_2' },
     { label: 'Stock total',  value: 5120, icon: 'warehouse' },
@@ -43,11 +39,11 @@ export class DashboardComponent {
     { label: 'Bajo stock',   value: 12,   icon: 'warning' },
   ];
 
-  // === Gráfica 1: Línea (ventas) ===
+  /* === Gráfica 1: Línea (ventas) === */
   lineChartType: ChartType = 'line';
   lineChartOptions: ChartConfiguration['options'] = {
     responsive: true,
-    maintainAspectRatio: false, // clave para altura controlada por CSS
+    maintainAspectRatio: false, // altura controlada por CSS (.chart-wrapper)
     interaction: { mode: 'index', intersect: false },
     plugins: { legend: { display: false }, tooltip: { enabled: true } },
     elements: { line: { tension: 0.35, borderWidth: 2 }, point: { radius: 3 } },
@@ -61,7 +57,7 @@ export class DashboardComponent {
     ]
   };
 
-  // === Gráfica 2: Mixta (barras + línea) con doble eje ===
+  /* === Gráfica 2: Mixta (barras + línea) con doble eje === */
   mixChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -76,12 +72,27 @@ export class DashboardComponent {
   mixChartData: ChartConfiguration['data'] = {
     labels: ['Cat A','Cat B','Cat C','Cat D','Cat E'],
     datasets: [
-      { type: 'bar',  label: 'Existencias',  data: [1200, 800, 430, 980, 610], borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.6 },
-      { type: 'line', label: 'Rotación (%)', data: [12, 18, 9, 15, 11], yAxisID: 'y1', fill: false, borderWidth: 2, pointRadius: 3 }
+      {
+        type: 'bar',
+        label: 'Existencias',
+        data: [1200, 800, 430, 980, 610],
+        borderRadius: 6,
+        barPercentage: 0.6,
+        categoryPercentage: 0.6
+      },
+      {
+        type: 'line',
+        label: 'Rotación (%)',
+        data: [12, 18, 9, 15, 11],
+        yAxisID: 'y1',
+        fill: false,
+        borderWidth: 2,
+        pointRadius: 3
+      }
     ]
   };
 
-  // === Gráfica 3: Dona (categorías) ===
+  /* === Gráfica 3: Dona (categorías) === */
   doughnutType: ChartType = 'doughnut';
   doughnutOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -93,13 +104,13 @@ export class DashboardComponent {
     datasets: [{ data: [35, 10, 15, 25, 15] }]
   };
 
-  // Tablas (mock)
+  /* Tablas (mock) */
   displayedColumns = ['sku','nombre','stock'];
   topProductos = [
     { sku: 'A-001', nombre: 'Teclado Mecánico',  stock: 45 },
     { sku: 'A-014', nombre: 'Mouse Inalámbrico', stock: 33 },
     { sku: 'B-203', nombre: 'Silla Ergonómica',  stock: 12 },
-    { sku: 'C-110', nombre: 'Monitor 27\"',      stock: 8 },
+    { sku: 'C-110', nombre: 'Monitor 27"',       stock: 8 },
     { sku: 'D-090', nombre: 'Hub USB-C',         stock: 67 },
   ];
 

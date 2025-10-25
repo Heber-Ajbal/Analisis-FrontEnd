@@ -66,9 +66,14 @@ export class InventoryListComponent implements OnInit {
   loading = signal(false);
 
   // Filtros y búsqueda
+  /** Texto que se escribe */
+  qInput = signal('');
+  /** Texto realmente aplicado al query del backend */
   q = signal('');
-  categoria = signal<string | null>(null); // mapea a 'type' del API
-  estado = signal<string | null>(null);    // de momento SIN USO real (no viene del API)
+  /** Mapea a "type" en Strapi */
+  categoria = signal<string | null>(null);
+  /** A futuro si decides filtrarlo en Strapi */
+  estado = signal<string | null>(null);
 
   // Tabla
   displayedColumns = ['sku', 'nombre', 'precio', 'stock', 'estado', 'acciones'];
@@ -81,14 +86,20 @@ export class InventoryListComponent implements OnInit {
     // carga inicial
     this.fetch();
 
-    // recarga al cambiar q/categoria/página/tamaño
+    // recarga al cambiar filtros "efectivos"
     effect(() => {
-      this.q();
+      this.q();               // se actualiza solo con Buscar/Enter
       this.categoria();
       this.page();
       this.pageSize();
       this.fetch();
     });
+  }
+
+  /** Aplica el texto del input al filtro y reinicia a página 1 */
+  applySearch() {
+    this.page.set(1);
+    this.q.set((this.qInput() || '').trim());
   }
 
   async fetch() {
@@ -100,7 +111,14 @@ export class InventoryListComponent implements OnInit {
         page: this.page(),
         pageSize: this.pageSize(),
       });
-      this.source.set(res.rows);
+
+      // Aseguramos que traigan la imagen desde Strapi (referenceImage)
+      const rows = (res.rows || []).map(p => ({
+        ...p,
+        imagenUrl: p.imagenUrl || undefined, // ya viene mapeada del service
+      }));
+
+      this.source.set(rows);
       this.total.set(res.total);
       this.page.set(res.page);
       this.pageSize.set(res.pageSize);
@@ -109,8 +127,10 @@ export class InventoryListComponent implements OnInit {
     }
   }
 
-  // Computados para la tabla (client-side ya NO filtra, solo refleja 'source')
+  // Filas a pintar
   rows = computed(() => this.source());
+
+  // categorías dinámicas (si quieres mostrar chips de filtro rápido)
   categorias = computed(() => {
     const set = new Set(
       this.source()
@@ -128,6 +148,7 @@ export class InventoryListComponent implements OnInit {
 
   // Filtros
   resetFilters() {
+    this.qInput.set('');
     this.q.set('');
     this.categoria.set(null);
     this.estado.set(null);
@@ -147,7 +168,6 @@ export class InventoryListComponent implements OnInit {
   stockPct(e: Product): number {
     const min = Math.max(1, Number((e as any).minimo) || 1);
     const cur = Math.max(0, Number((e as any).stock) || 0);
-    // 0% al 0, 100% cuando duplica el mínimo (ajustable)
     const pct = (cur / (min * 2)) * 100;
     return Math.max(4, Math.min(100, Math.round(pct)));
   }

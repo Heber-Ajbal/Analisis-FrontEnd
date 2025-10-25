@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -52,15 +52,16 @@ type Store = {
     MatDividerModule,
   ],
 })
-
 export class HomeComponent implements OnInit {
   // --- UI state ---
   query = new FormControl('');
   usingLocation = false;
   userCoords: { lat: number; lng: number } | null = null;
-   currentYear = new Date().getFullYear();
+  currentYear = new Date().getFullYear();
 
-  // --- Catálogo / mock data (luego lo reemplazas por tu API) ---
+  constructor(private router: Router) {}
+
+  // --- Catálogo / mock data ---
   categories: Category[] = [
     { label: 'Aceites', icon: 'oil_barrel', slug: 'aceites' },
     { label: 'Filtros', icon: 'filter_alt', slug: 'filtros' },
@@ -74,16 +75,16 @@ export class HomeComponent implements OnInit {
     {
       title: 'Semana del Lubricante',
       subtitle: 'Hasta 30% OFF en marcas seleccionadas',
-      image: 'https://picsum.photos/seed/lube/1200/400',
+      image: 'https://img.freepik.com/fotos-premium/mecanico-automoviles-llena-aceite-motor-lubricante-fresco-garaje-automoviles-mantenimiento-automovil_41043-473.jpg',
       cta: 'Ver ofertas',
-      href: '/catalogo?promo=lubricantes',
+      qp: { promo: 'lubricantes' }, // <- query params
     },
     {
       title: 'Frenos seguros',
       subtitle: 'Kits de pastillas + discos',
-      image: 'https://picsum.photos/seed/brakes/1200/400',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw7atwOLr404KCYCMh9iLPpxoMgNIJD1UeR94OU2Wwt4azEF3TYCA9dZacZIIvW6PJ3yA&usqp=CAU',
       cta: 'Comprar ahora',
-      href: '/catalogo?cat=frenos',
+      qp: { cat: 'frenos' }, // <- query params
     },
   ];
 
@@ -92,7 +93,7 @@ export class HomeComponent implements OnInit {
       id: 'p1',
       name: 'Aceite sintético 5W-30 4L',
       price: 29.9,
-      image: 'https://picsum.photos/seed/aceite/600/400',
+      image: 'https://cdn.kemik.gt/2020/10/SUPERLITE-EUROL-5W-30-4L-1000X1000-1.jpg',
       rating: 4.6,
       category: 'aceites',
       inStock: true,
@@ -102,7 +103,7 @@ export class HomeComponent implements OnInit {
       id: 'p2',
       name: 'Filtro de aire universal',
       price: 14.5,
-      image: 'https://picsum.photos/seed/filtro/600/400',
+      image: 'https://m.media-amazon.com/images/I/61qBPfVuS4L.jpg',
       rating: 4.2,
       category: 'filtros',
       inStock: true,
@@ -112,7 +113,7 @@ export class HomeComponent implements OnInit {
       id: 'p3',
       name: 'Pastillas de freno delanteras',
       price: 24.0,
-      image: 'https://picsum.photos/seed/freno/600/400',
+      image: 'https://images-na.ssl-images-amazon.com/images/I/81hewmtgV8L._AC_UL495_SR435,495_.jpg',
       rating: 4.8,
       category: 'frenos',
       inStock: true,
@@ -122,7 +123,7 @@ export class HomeComponent implements OnInit {
       id: 'p4',
       name: 'Batería 12V 60Ah',
       price: 95.0,
-      image: 'https://picsum.photos/seed/bateria/600/400',
+      image: 'https://cdn.kemik.gt/2021/07/0986A00365-1000X1000-2.jpg',
       rating: 4.4,
       category: 'baterias',
       inStock: true,
@@ -138,15 +139,21 @@ export class HomeComponent implements OnInit {
   nearby: Array<Store & { distanceKm: number }> = [];
 
   ngOnInit(): void {
-    // Precargar resultados "cerca" ordenados por nombre si aún no hay ubicación
-    this.nearby = this.stores.map(s => ({ ...s, distanceKm: NaN }));
+    // Precargar resultados "cerca" si no hay ubicación
+    this.nearby = this.stores.map((s) => ({ ...s, distanceKm: NaN }));
+  }
+
+  // Buscar -> /catalogo?q=...
+  onSearch() {
+    const q = (this.query.value ?? '').trim();
+    this.router.navigate(['/catalogo'], { queryParams: q ? { q } : {} });
   }
 
   get filteredFeatured(): Product[] {
     const q = (this.query.value ?? '').trim().toLowerCase();
     if (!q) return this.featured;
-    return this.featured.filter(p =>
-      [p.name, p.category].some(t => t.toLowerCase().includes(q))
+    return this.featured.filter((p) =>
+      [p.name, p.category].some((t) => t.toLowerCase().includes(q))
     );
   }
 
@@ -157,7 +164,7 @@ export class HomeComponent implements OnInit {
       (pos) => {
         this.userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         this.nearby = this.stores
-          .map(s => ({
+          .map((s) => ({
             ...s,
             distanceKm: this.haversineKm(this.userCoords!.lat, this.userCoords!.lng, s.lat, s.lng),
           }))
@@ -172,7 +179,7 @@ export class HomeComponent implements OnInit {
   }
 
   addToCart(p: Product) {
-    // TODO: integrar con tu CartService
+    // TODO: integrar con tu CartService real
     console.log('Añadido al carrito', p);
   }
 
@@ -192,10 +199,7 @@ export class HomeComponent implements OnInit {
     return Math.round(R * c * 10) / 10; // 0.1 km
   }
 
-
-stars(rating: number): number[] {
-  return Array.from({ length: Math.round(rating) });
-}
-
-
+  stars(rating: number): number[] {
+    return Array.from({ length: Math.round(rating) });
+  }
 }

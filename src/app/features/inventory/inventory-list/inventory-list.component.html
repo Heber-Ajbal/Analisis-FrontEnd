@@ -11,20 +11,27 @@
 
   <div class="toolbar-actions">
     <div class="toolbar-search">
-      <mat-form-field appearance="outline" class="field xs-hide">
-        <mat-label>Buscar</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input
-          matInput
-          placeholder="SKU, nombre, proveedor…"
-          [value]="q()"
-          (input)="q.set($any($event.target).value)"
-        />
-        <button *ngIf="q()" matSuffix mat-icon-button aria-label="Clear" (click)="q.set('')">
-          <mat-icon>close</mat-icon>
+      <form (ngSubmit)="applySearch()" class="w-full" style="display:flex;gap:8px;align-items:center;">
+        <mat-form-field appearance="outline" class="field xs-hide">
+          <mat-label>Buscar</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="SKU, nombre, proveedor…"
+            [value]="qInput()"
+            (input)="qInput.set($any($event.target).value)"
+          />
+          <button *ngIf="qInput()" matSuffix mat-icon-button aria-label="Clear" (click)="qInput.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-stroked-button type="submit">
+          <mat-icon>search</mat-icon>
+          Buscar
         </button>
-      </mat-form-field>
-    </div>
+      </form>
+</div>
+
 
     <button mat-flat-button color="primary" class="pill" (click)="openNew()">
       <mat-icon>add</mat-icon><span>Nuevo</span>

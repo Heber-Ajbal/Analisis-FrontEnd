@@ -7,11 +7,11 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { ReviewComponent }   from './features/auth/review/review.component';
 import { HomeComponent }     from './features/home/home.component';
 import { AdminComponent }    from './features/admin/admin.component';
-import { CatalogComponent } from './features/catalog/catalog.component';
-import { CartComponent } from './features/cart/cart.component';
-import { ProfileComponent } from './features/profile/profile.component';
+import { CatalogComponent }  from './features/catalog/catalog.component';
+import { CartComponent }     from './features/cart/cart.component';
+import { ProfileComponent }  from './features/profile/profile.component';
 
-//ADMIN
+// ADMIN
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { PurchaseManagementComponent } from './features/purchases/purchase-management.component';
 
@@ -19,7 +19,7 @@ import { PurchaseManagementComponent } from './features/purchases/purchase-manag
 import { authGuard }   from './core/guards/auth.guard';
 import { adminGuard }  from './core/guards/admin.guard';
 import { reviewGuard } from './core/guards/review.guard';
-import { guestGuard } from './core/guards/guest.guard';
+import { guestGuard }  from './core/guards/guest.guard';
 
 // Layout
 import { AppLayoutComponent } from './layout/app-layout.component';
@@ -29,37 +29,47 @@ export const routes: Routes = [
     path: '',
     component: AppLayoutComponent,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' }, 
-      { path: 'login',    component: LoginComponent,canActivate: [guestGuard] },
-      { path: 'registro', component: RegisterComponent,canActivate: [guestGuard] },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
 
-      { path: 'revision', component: ReviewComponent, canActivate: [reviewGuard] },
+      // públicas / auth
+      { path: 'login',    component: LoginComponent,    canActivate: [guestGuard] },
+      { path: 'registro', component: RegisterComponent, canActivate: [guestGuard] },
+      { path: 'revision', component: ReviewComponent,   canActivate: [reviewGuard] },
+
+      // storefront
       { path: 'home',     component: HomeComponent },
-      { path: 'admin',    component: AdminComponent,  canActivate: [adminGuard] },
-      { path: 'catalogo', component: CatalogComponent },
-      { path: 'carrito', component: CartComponent },
-      { path: 'perfil', component: ProfileComponent, canActivate: [authGuard] },
+      { path: 'catalogo', component: CatalogComponent },            // <- catálogo
+      { path: 'buscar',   redirectTo: 'catalogo', pathMatch: 'full' }, // <- alias útil
+      { path: 'carrito',  component: CartComponent },
+      { path: 'perfil',   component: ProfileComponent,  canActivate: [authGuard] },
 
+      // admin / módulos
+      { path: 'admin',     component: AdminComponent,   canActivate: [adminGuard] },
       { path: 'dashboard', component: DashboardComponent },
+
       {
         path: 'inventario',
         loadChildren: () =>
-          import('./features/inventory/inventory.module').then((m) => m.InventoryModule),
+          import('./features/inventory/inventory.module').then(m => m.InventoryModule),
         // canActivate: [adminGuard],
       },
       {
         path: 'publicidad',
         loadChildren: () =>
-          import('./features/advertising/advertising.module').then((m) => m.AdvertisingModule),
+          import('./features/advertising/advertising.module').then(m => m.AdvertisingModule),
         // canActivate: [adminGuard],
       },
       {
         path: 'usuarios',
         loadChildren: () =>
-          import('./features/users/users.module').then((m) => m.UsersModule),
-        //canActivate: [adminGuard],
+          import('./features/users/users.module').then(m => m.UsersModule),
+        // canActivate: [adminGuard],
       },
+
       { path: 'compras', component: PurchaseManagementComponent /*, canActivate: [adminGuard]*/ },
-    ]
-  }
+    ],
+  },
+
+  // catch-all
+  { path: '**', redirectTo: 'home' },
 ];

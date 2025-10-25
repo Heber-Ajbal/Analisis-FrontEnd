@@ -41,9 +41,9 @@ interface CatalogProduct {
 }
 
 const PLACEHOLDER_IMAGES = [
-  'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1000&q=80',
-  'https://images.unsplash.com/photo-1619680848568-2f21e535fe5a?auto=format&fit=crop&w=1000&q=80',
-  'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&w=1000&q=80',
+  'https://clickmica.fundaciondescubre.es/files/2018/11/980be303c3585ae1af8d86c1433ab08161004639.jpg',
+  'https://clickmica.fundaciondescubre.es/files/2018/11/980be303c3585ae1af8d86c1433ab08161004639.jpg',
+  'https://euromoys.gt/wp-content/uploads/2024/06/BUJE-MULETA-BMW-F21-F20-F30-F31-31126855743-20940496.jpg',
   'https://images.unsplash.com/photo-1604709177225-055f99402ea3?auto=format&fit=crop&w=1000&q=80',
   'https://images.unsplash.com/photo-1520454974749-611b04eb89ed?auto=format&fit=crop&w=1000&q=80',
 ];
