@@ -45,7 +45,7 @@ export class ProductFormDialogComponent {
       precio:    [data?.precio ?? 0, [Validators.required, Validators.min(0)]],
       description: [data?.description ?? ''],
       imagenUrl: [data?.imagenUrl ?? null], // solo UI
-      stock:     [data?.stock ?? 0],        // solo UI por ahora
+      stock:     [data?.stock ?? 0, [Validators.min(0)]],
       minimo:    [data?.minimo ?? 0],       // solo UI por ahora
       estado:    [data?.estado ?? 'activo'] // solo UI por ahora
     });
@@ -66,9 +66,26 @@ export class ProductFormDialogComponent {
         description: v['description'] ?? null
       };
 
-      const result = v.id
+      const isEdit = Boolean(v.id);
+      const result = isEdit
         ? await this.inv.update(v.documentId, payload)
         : await this.inv.create(payload);
+
+      if (!isEdit) {
+        const quantity = Number(v.stock ?? 0);
+        if (Number.isFinite(quantity)) {
+          const productId = Number(result.id);
+          if (Number.isNaN(productId)) {
+            throw new Error('No fue posible obtener el identificador del producto.');
+          }
+
+          await this.inv.createInventoryRecord({
+            productId,
+            quantity,
+            vendor: v.proveedor ?? null,
+          });
+        }
+      }
 
       this.snack.open('Producto guardado', 'OK', { duration: 2000 });
       this.ref.close(result);
