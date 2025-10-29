@@ -207,10 +207,10 @@
       <section class="items-section">
         <div class="section-header">
           <h3>Artículos solicitados</h3>
-          <span>{{ selected()?.items.length }} ítems</span>
+          <span>{{ selected()?.items?.length }} ítems</span>
         </div>
 
-        <div class="items-table" *ngIf="selected()?.items.length; else noItems">
+        <div class="items-table" *ngIf="selected()?.items?.length; else noItems">
           <div class="items-header">
             <span>SKU</span>
             <span>Descripción</span>
@@ -248,7 +248,7 @@
         </div>
       </section>
 
-      <section class="timeline-section" *ngIf="selected()?.timeline.length">
+      <section class="timeline-section" *ngIf="selected()?.timeline?.length">
         <div class="section-header">
           <h3>Línea de tiempo</h3>
         </div>
