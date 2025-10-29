@@ -1,28 +1,5 @@
 <mat-sidenav-container class="shell">
 
-  <!-- TOPBAR -->
-  <mat-toolbar color="primary" class="topbar">
-    <button mat-icon-button (click)="drawer.toggle()" *ngIf="(isHandset$ | async)">
-      <mat-icon>menu</mat-icon>
-    </button>
-
-    <span class="brand">APP</span>
-    <span class="spacer"></span>
-
-    <button *ngIf="loggedIn" mat-button routerLink="/perfil">
-      <mat-icon>person</mat-icon>
-      <span class="hide-handset">Perfil</span>
-    </button>
-    <button *ngIf="loggedIn" mat-button (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span class="hide-handset">Salir</span>
-    </button>
-    <button *ngIf="!loggedIn" mat-stroked-button routerLink="/login">
-      <mat-icon>login</mat-icon>
-      <span class="hide-handset">Ingresar</span>
-    </button>
-  </mat-toolbar>
-
   <!-- SIDENAV -->
   <mat-sidenav
     #drawer
@@ -147,6 +124,27 @@
 
   <!-- CONTENIDO -->
   <mat-sidenav-content class="content">
+    <mat-toolbar color="primary" class="topbar">
+      <button mat-icon-button (click)="drawer.toggle()" *ngIf="(isHandset$ | async)">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="brand">APP</span>
+      <span class="spacer"></span>
+
+      <button *ngIf="loggedIn" mat-button routerLink="/perfil">
+        <mat-icon>person</mat-icon>
+        <span class="hide-handset">Perfil</span>
+      </button>
+      <button *ngIf="loggedIn" mat-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span class="hide-handset">Salir</span>
+      </button>
+      <button *ngIf="!loggedIn" mat-stroked-button routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span class="hide-handset">Ingresar</span>
+      </button>
+    </mat-toolbar>
     <div class="page">
       <router-outlet></router-outlet>
     </div>
