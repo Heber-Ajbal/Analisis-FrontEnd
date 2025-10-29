@@ -1,3 +1,11 @@
+:host {
+  display: block;
+  min-height: 100%;
+  padding: clamp(20px, 3vw, 32px);
+  box-sizing: border-box;
+  background: var(--mat-sys-surface, #f6f7fb);
+}
+
 .user-toolbar {
   margin-bottom: 1rem;
 

@@ -3,15 +3,18 @@
   display: block;
   color: #1f2937;
   min-height: 100%;
+  padding: clamp(24px, 4vw, 48px) 0 clamp(56px, 6vw, 96px);
+  box-sizing: border-box;
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  padding-bottom: 32px;
 }
 
 .page-toolbar {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 0 24px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 3vw, 28px);
+  width: min(1240px, 100%);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
 }
 
@@ -45,9 +48,10 @@
   display: grid;
   grid-template-columns: 300px 1fr 420px;
   gap: 24px;
-  padding: 24px;
-  margin: 24px auto;
-  width: min(1240px, 100% - 32px);
+  padding: clamp(18px, 3vw, 28px);
+  margin: clamp(24px, 4vw, 48px) auto;
+  width: min(1240px, 100%);
+  box-sizing: border-box;
 }
 
 .page-grid.loading {

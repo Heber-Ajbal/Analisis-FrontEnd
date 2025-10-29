@@ -1,9 +1,17 @@
-.shell   { height: 100dvh; background:#fff; }
+.shell   { min-height: 100dvh; background:#fff; }
 .topbar  { position: sticky; top: 0; z-index: 10; }
 .brand   { font-weight: 600; letter-spacing:.2px; }
 .sidenav { border-right: 1px solid rgba(0,0,0,.08); background:#fff; }
-.content { height: 100dvh; display:flex; flex-direction:column; }
-.page    { flex:1 1 auto; overflow:auto; padding: 16px; max-width:1280px; margin:0 auto; }
+.content { flex:1 1 auto; min-height: 100dvh; display:flex; flex-direction:column; }
+.page    {
+  flex:1 1 auto;
+  width: 100%;
+  max-width: 1280px;
+  margin:0 auto;
+  padding: clamp(16px, 3vw, 32px);
+  box-sizing: border-box;
+  overflow: visible;
+}
 
 .menu { display:flex; flex-direction:column; height:100%; padding:.5rem; gap:.25rem; }
 .menu.collapsed .label { display:none; }
