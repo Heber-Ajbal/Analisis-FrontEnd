@@ -41,8 +41,11 @@ body {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-mat-sidenav-container, mat-sidenav-content, .mat-drawer-content {
-  height: 100dvh;
+mat-sidenav-container,
+mat-sidenav-content,
+.mat-drawer-content {
+  min-height: 100dvh;
+  height: auto;
   background: #fff;
 }
 

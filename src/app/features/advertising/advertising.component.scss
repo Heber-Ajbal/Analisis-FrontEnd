@@ -1,6 +1,8 @@
 :host {
   display: block;
   min-height: 100%;
+  padding: clamp(24px, 4vw, 48px) 0;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -8,7 +10,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding: 32px;
+  padding: clamp(24px, 4vw, 40px);
+  min-height: 100%;
   max-width: 1400px;
   margin: 0 auto;
 }
