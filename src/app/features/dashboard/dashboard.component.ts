@@ -100,24 +100,24 @@ export class DashboardComponent {
     plugins: { legend: { position: 'right' } }
   };
   doughnutData: ChartConfiguration['data'] = {
-    labels: ['Periféricos', 'Sillas', 'Monitores', 'Almacenamiento', 'Cables'],
+    labels: ['Llantas', 'Motores', 'Frenos', 'Aceites', 'Silvines'],
     datasets: [{ data: [35, 10, 15, 25, 15] }]
   };
 
   /* Tablas (mock) */
   displayedColumns = ['sku','nombre','stock'];
   topProductos = [
-    { sku: 'A-001', nombre: 'Teclado Mecánico',  stock: 45 },
-    { sku: 'A-014', nombre: 'Mouse Inalámbrico', stock: 33 },
-    { sku: 'B-203', nombre: 'Silla Ergonómica',  stock: 12 },
-    { sku: 'C-110', nombre: 'Monitor 27"',       stock: 8 },
-    { sku: 'D-090', nombre: 'Hub USB-C',         stock: 67 },
+    { sku: 'A-001', nombre: 'Llantas',  stock: 45 },
+    { sku: 'A-014', nombre: 'Filtro de Aire', stock: 33 },
+    { sku: 'B-203', nombre: 'Aceite 90w40',  stock: 12 },
+    { sku: 'C-110', nombre: 'Fusibles"',       stock: 8 },
+    { sku: 'D-090', nombre: 'Fajas',         stock: 67 },
   ];
 
   displayedColumnsPend = ['sku','nombre','minimo','actual'];
   pendientes = [
-    { sku: 'Z-777', nombre: 'Papel Fotográfico', minimo: 20, actual: 7 },
-    { sku: 'X-321', nombre: 'Cables HDMI',       minimo: 40, actual: 15 },
-    { sku: 'M-009', nombre: 'SSD 1TB',           minimo: 10, actual: 3 },
+    { sku: 'Z-777', nombre: 'Bujías', minimo: 20, actual: 7 },
+    { sku: 'X-321', nombre: 'Tren delantero',       minimo: 40, actual: 15 },
+    { sku: 'M-009', nombre: 'Caja de Cambios',           minimo: 10, actual: 3 },
   ];
 }

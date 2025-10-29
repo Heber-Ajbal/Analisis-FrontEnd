@@ -41,11 +41,11 @@ interface CatalogProduct {
 }
 
 const PLACEHOLDER_IMAGES = [
-  'https://clickmica.fundaciondescubre.es/files/2018/11/980be303c3585ae1af8d86c1433ab08161004639.jpg',
-  'https://clickmica.fundaciondescubre.es/files/2018/11/980be303c3585ae1af8d86c1433ab08161004639.jpg',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoNdNAZA1LdVWNmBBzxXCqLUodt3FVsQsXVw&s',
+  'https://neumarket.com.mx/cdn/shop/files/pilot-sport-ps3_23_1_1_1_20_1200x1200.jpg?v=1716688653',
   'https://euromoys.gt/wp-content/uploads/2024/06/BUJE-MULETA-BMW-F21-F20-F30-F31-31126855743-20940496.jpg',
-  'https://images.unsplash.com/photo-1604709177225-055f99402ea3?auto=format&fit=crop&w=1000&q=80',
-  'https://images.unsplash.com/photo-1520454974749-611b04eb89ed?auto=format&fit=crop&w=1000&q=80',
+  'https://images.rewise.ai/processed/legos/m/74a4d9e7_fusible1.png',
+  'https://www.pgfilters.com/wp-content/uploads/2023/02/What-is-the-Oil-Filters-Primary-Job_-1000x675-1.jpg',
 ];
 
 @Component({
