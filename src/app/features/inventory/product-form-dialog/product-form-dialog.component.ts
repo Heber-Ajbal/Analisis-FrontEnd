@@ -38,6 +38,7 @@ export class ProductFormDialogComponent {
     this.form = this.fb.group({
       id:        [data?.id ?? null],
       documentId: [data?.documentId],
+      inventoryId: [data?.inventoryId ?? null],
       sku:       [data?.sku ?? '', [Validators.required, Validators.maxLength(32)]],
       nombre:    [data?.nombre ?? '', [Validators.required, Validators.maxLength(120)]],
       categoria: [data?.categoria ?? null],
@@ -47,7 +48,9 @@ export class ProductFormDialogComponent {
       imagenUrl: [data?.imagenUrl ?? null], // solo UI
       stock:     [data?.stock ?? 0, [Validators.min(0)]],
       minimo:    [data?.minimo ?? 0],       // solo UI por ahora
-      estado:    [data?.estado ?? 'activo'] // solo UI por ahora
+      estado:    [data?.estado ?? 'activo'], // solo UI por ahora
+      adjustmentAction: ['add'],
+      adjustmentQuantity: [0, [Validators.min(0)]],
     });
   }
 
@@ -83,6 +86,17 @@ export class ProductFormDialogComponent {
             productId,
             quantity,
             vendor: v.proveedor ?? null,
+          });
+        }
+      } else {
+        const inventoryId = v.inventoryId ?? this.data?.inventoryId ?? null;
+        const quantity = Number(v.adjustmentQuantity ?? 0);
+        const action = v.adjustmentAction === 'remove' ? 'remove' : 'add';
+
+        if (inventoryId != null && Number.isFinite(quantity) && quantity > 0) {
+          await this.inv.adjustInventoryRecord(inventoryId, {
+            quantity,
+            action,
           });
         }
       }

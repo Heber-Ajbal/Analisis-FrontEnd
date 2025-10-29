@@ -161,6 +161,25 @@ export class InventoryService {
     );
   }
 
+  async adjustInventoryRecord(
+    inventoryId: number | string,
+    movement: { quantity: number; action: 'add' | 'remove' }
+  ): Promise<void> {
+    const quantity = Math.max(0, Math.trunc(movement.quantity ?? 0));
+    const action = movement.action === 'remove' ? 'remove' : 'add';
+
+    if (!quantity) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.http.patch(`${this.API}/bulkloadinventory/update/${inventoryId}`, {
+        quantity,
+        action,
+      })
+    );
+  }
+
   async create(p: {
     sku: string;
     nombre: string;
