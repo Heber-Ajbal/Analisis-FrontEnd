@@ -1,0 +1,41 @@
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.product-summary .name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.product-summary .meta {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.product-summary .stock {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.field {
+  width: 100%;
+}
+
+.actions {
+  padding: 16px 0 0;
+}

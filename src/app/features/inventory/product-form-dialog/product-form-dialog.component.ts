@@ -93,11 +93,25 @@ export class ProductFormDialogComponent {
         const quantity = Number(v.adjustmentQuantity ?? 0);
         const action = v.adjustmentAction === 'remove' ? 'remove' : 'add';
 
-        if (inventoryId != null && Number.isFinite(quantity) && quantity > 0) {
-          await this.inv.adjustInventoryRecord(inventoryId, {
-            quantity,
-            action,
-          });
+        if (Number.isFinite(quantity) && quantity > 0) {
+          if (inventoryId != null) {
+            await this.inv.adjustInventoryRecord(inventoryId, {
+              quantity,
+              action,
+            });
+          } else if (action === 'add') {
+            const productId = Number(result.id ?? v.id ?? this.data?.id);
+
+            if (!Number.isFinite(productId)) {
+              throw new Error('No fue posible obtener el identificador del producto.');
+            }
+
+            await this.inv.createInventoryRecord({
+              productId,
+              quantity,
+              vendor: v.proveedor ?? this.data?.proveedor ?? null,
+            });
+          }
         }
       }
 

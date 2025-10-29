@@ -27,6 +27,7 @@ import { InventoryService } from '../../../core/services/inventory.service';
 import { Product } from '../../../models/inventory/inventory.models';
 import { ProductFormDialogComponent } from '../product-form-dialog/product-form-dialog.component';
 import { StockMovementsDrawerComponent } from '../stock-movements-drawer/stock-movements-drawer.component';
+import { InventoryAdjustDialogComponent } from '../inventory-adjust-dialog/inventory-adjust-dialog.component';
 
 @Component({
   selector: 'app-inventory-list',
@@ -53,6 +54,7 @@ import { StockMovementsDrawerComponent } from '../stock-movements-drawer/stock-m
     MatSidenavModule,
     MatDividerModule,
     MatProgressBarModule,
+    InventoryAdjustDialogComponent,
   ],
   templateUrl: './inventory-list.component.html',
   styleUrls: ['./inventory-list.component.scss'],
@@ -190,6 +192,17 @@ export class InventoryListComponent implements OnInit {
     const ref = this.dialog.open(ProductFormDialogComponent, { width: '720px', data: p });
     ref.afterClosed().subscribe((saved) => {
       if (saved) this.fetch();
+    });
+  }
+
+  openAdjust(p: Product, action: 'add' | 'remove' = 'add') {
+    const ref = this.dialog.open(InventoryAdjustDialogComponent, {
+      width: '420px',
+      data: { product: p, action },
+    });
+
+    ref.afterClosed().subscribe((changed) => {
+      if (changed) this.fetch();
     });
   }
 

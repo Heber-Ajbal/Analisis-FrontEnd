@@ -54,8 +54,11 @@
         <mat-label>Movimiento de inventario</mat-label>
         <mat-select formControlName="adjustmentAction">
           <mat-option value="add">Agregar unidades</mat-option>
-          <mat-option value="remove">Retirar unidades</mat-option>
+          <mat-option value="remove" [disabled]="!form.value.inventoryId">Retirar unidades</mat-option>
         </mat-select>
+        <mat-hint *ngIf="!form.value.inventoryId">
+          Se creará un registro de inventario al agregar unidades.
+        </mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
