@@ -190,6 +190,12 @@
               <button mat-menu-item (click)="openEdit(e)">
                 <mat-icon>edit</mat-icon><span>Editar</span>
               </button>
+              <button mat-menu-item (click)="openAdjust(e, 'add')">
+                <mat-icon>add_shopping_cart</mat-icon><span>Agregar inventario</span>
+              </button>
+              <button mat-menu-item (click)="openAdjust(e, 'remove')" [disabled]="!e.inventoryId">
+                <mat-icon>remove_shopping_cart</mat-icon><span>Retirar inventario</span>
+              </button>
               <button mat-menu-item (click)="openMoves(e)">
                 <mat-icon>history</mat-icon><span>Movimientos</span>
               </button>

@@ -35,6 +35,50 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
+      <mat-label>Cantidad inicial (inventario)</mat-label>
+      <input
+        matInput
+        type="number"
+        min="0"
+        step="1"
+        formControlName="stock"
+        placeholder="0"
+        [disabled]="form.value.id"
+      />
+      <mat-hint *ngIf="form.value.id">Actualiza el stock desde los movimientos de inventario.</mat-hint>
+      <mat-error *ngIf="form.get('stock')?.hasError('min')">No puede ser negativo</mat-error>
+    </mat-form-field>
+
+    <ng-container *ngIf="form.value.id">
+      <mat-form-field appearance="fill">
+        <mat-label>Movimiento de inventario</mat-label>
+        <mat-select formControlName="adjustmentAction">
+          <mat-option value="add">Agregar unidades</mat-option>
+          <mat-option value="remove" [disabled]="!form.value.inventoryId">Retirar unidades</mat-option>
+        </mat-select>
+        <mat-hint *ngIf="!form.value.inventoryId">
+          Se creará un registro de inventario al agregar unidades.
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Cantidad a mover</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          step="1"
+          formControlName="adjustmentQuantity"
+          placeholder="0"
+        />
+        <mat-hint>Solo se aplicará si es mayor a 0.</mat-hint>
+        <mat-error *ngIf="form.get('adjustmentQuantity')?.hasError('min')">
+          No puede ser negativo
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <mat-form-field appearance="fill">
       <mat-label>Descripción</mat-label>
       <textarea matInput rows="3" formControlName="description" placeholder="Opcional"></textarea>
     </mat-form-field>

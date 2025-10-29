@@ -3,7 +3,28 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Product, ProductApi, mapApiToProduct } from '../../models/inventory/inventory.models';
+import {
+  Product,
+  ProductApi,
+  determineProductStatus,
+  mapApiToProduct,
+} from '../../models/inventory/inventory.models';
+
+type InventoryItemApi = {
+  id: number;
+  documentId?: string;
+  quantity?: number;
+  stock_status?: string | null;
+  last_updated?: string | null;
+  vendor?: string | null;
+  product?: ProductApi | null;
+};
+
+type InventoryListResponse = {
+  message?: string;
+  total?: number;
+  data?: InventoryItemApi[];
+};
 
 type ProductsResponse = {
   data: ProductApi[];
@@ -48,14 +69,115 @@ export class InventoryService {
       // 👇 IMPORTANTE: trae la media para poder construir imagenUrl
       .set('populate', 'referenceImage');
 
-    const res = await firstValueFrom(
-      this.http.get<ProductsResponse>(`${this.API}/products`, { params })
+    const [productsRes, inventoryRes] = await Promise.all([
+      firstValueFrom(this.http.get<ProductsResponse>(`${this.API}/products`, { params })),
+      this.fetchInventorySnapshot(),
+    ]);
+
+    const inventoryByProduct = new Map<number, InventoryItemApi>();
+    for (const item of inventoryRes.data ?? []) {
+      const productId = item?.product?.id;
+      if (typeof productId === 'number') {
+        inventoryByProduct.set(productId, item);
+      }
+    }
+
+    const rows = (productsRes.data ?? []).map((apiProduct) => {
+      const base = mapApiToProduct(apiProduct);
+      const productId = Number(base.id);
+      const inventory = Number.isFinite(productId) ? inventoryByProduct.get(productId) : undefined;
+
+      if (!inventory) {
+        return base;
+      }
+
+      const quantity = Number(inventory.quantity ?? 0);
+      const minimo = base.minimo ?? 0;
+      const status = inventory.stock_status ?? null;
+      const estado = this.mapStockStatusToProductStatus(status, quantity, minimo);
+
+      return {
+        ...base,
+        stock: Number.isFinite(quantity) ? quantity : base.stock,
+        minimo,
+        estado,
+        proveedor: base.proveedor ?? inventory.vendor ?? null,
+        inventoryId: inventory.id,
+        inventoryDocumentId: inventory.documentId ?? null,
+        stockStatus: status,
+        lastUpdated: inventory.last_updated ?? null,
+      };
+    });
+
+    const meta = productsRes.meta?.pagination ?? { page, pageSize, pageCount: 1, total: rows.length };
+
+    return {
+      rows,
+      total: meta.total,
+      page: meta.page,
+      pageSize: meta.pageSize,
+      pageCount: meta.pageCount,
+    };
+  }
+
+  private fetchInventorySnapshot(): Promise<InventoryListResponse> {
+    return firstValueFrom(
+      this.http.get<InventoryListResponse>(`${this.API}/bulkloadinventory/all`)
+    ).catch(() => ({ data: [], total: 0 } as InventoryListResponse));
+  }
+
+  private mapStockStatusToProductStatus(
+    status: string | null,
+    quantity: number,
+    minimo: number
+  ): Product['estado'] {
+    switch (status) {
+      case 'in_stock':
+        return 'activo';
+      case 'low_stock':
+        return 'bajo-stock';
+      case 'out_of_stock':
+      case 'no_stock':
+        return 'inactivo';
+      default:
+        return determineProductStatus(quantity, minimo);
+    }
+  }
+
+  async createInventoryRecord(entry: {
+    productId: number;
+    quantity: number;
+    vendor?: string | null;
+  }): Promise<void> {
+    const quantity = Math.max(0, Math.trunc(entry.quantity ?? 0));
+    const vendor = (entry.vendor ?? '').trim();
+
+    await firstValueFrom(
+      this.http.post(`${this.API}/bulkloadinventory/createOne`, {
+        product: entry.productId,
+        quantity,
+        vendor,
+      })
     );
+  }
 
-    const rows = (res.data ?? []).map(mapApiToProduct);
-    const meta = res.meta?.pagination ?? { page, pageSize, pageCount: 1, total: rows.length };
+  async adjustInventoryRecord(
+    inventoryId: number | string,
+    movement: { quantity: number; action: 'add' | 'remove' }
+  ): Promise<void> {
+    const quantity = Math.max(0, Math.trunc(movement.quantity ?? 0));
+    const action = movement.action === 'remove' ? 'remove' : 'add';
 
-    return { rows, total: meta.total, page: meta.page, pageSize: meta.pageSize, pageCount: meta.pageCount };
+    if (!quantity) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.http.patch(`${this.API}/bulkloadinventory/update/${inventoryId}`, {
+        quantity,
+        action,
+      })
+    );
   }
 
   async create(p: {

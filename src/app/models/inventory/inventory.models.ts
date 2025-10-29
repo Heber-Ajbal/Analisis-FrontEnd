@@ -77,6 +77,14 @@ export interface Product {
   minimo: number;
   estado: ProductStatus;
   imagenUrl?: string | null; // URL absoluta
+  /** Identificador del registro de inventario asociado (Strapi) */
+  inventoryId?: number | string;
+  /** DocumentId del registro de inventario asociado */
+  inventoryDocumentId?: string | null;
+  /** Estado crudo devuelto por el API de inventario (p. ej. `in_stock`) */
+  stockStatus?: string | null;
+  /** Fecha de última actualización del inventario */
+  lastUpdated?: string | null;
 }
 
 // ============================================================================
@@ -112,7 +120,7 @@ function toNumber(n: number | string | null | undefined, fallback = 0): number {
 /**
  * Determina el estado según stock/mínimo.
  */
-const determineProductStatus = (stock: number, minimo: number): ProductStatus => {
+export const determineProductStatus = (stock: number, minimo: number): ProductStatus => {
   if (stock <= 0) return 'inactivo';
   if (stock <= minimo) return 'bajo-stock';
   return 'activo';
@@ -160,6 +168,10 @@ export function mapApiToProduct(apiProduct: ProductApi): Product {
     minimo,
     estado,
     imagenUrl, // 👈 ahora sí mapeado desde Strapi
+    inventoryId: undefined,
+    inventoryDocumentId: undefined,
+    stockStatus: null,
+    lastUpdated: null,
   };
 }
 

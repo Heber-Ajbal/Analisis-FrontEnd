@@ -1,0 +1,35 @@
+<h2 mat-dialog-title class="title">
+  <mat-icon>inventory</mat-icon>
+  <span>Ajustar inventario</span>
+</h2>
+
+<mat-dialog-content class="content">
+  <div class="product-summary">
+    <div class="name">{{ product.nombre }}</div>
+    <div class="meta">SKU {{ product.sku }} • {{ product.proveedor || 'Sin proveedor' }}</div>
+    <div class="stock">Stock actual: {{ product.stock }} unidades</div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" id="adjustForm">
+    <mat-form-field appearance="fill" class="field">
+      <mat-label>Acción</mat-label>
+      <mat-select formControlName="action">
+        <mat-option value="add">Agregar unidades</mat-option>
+        <mat-option value="remove" [disabled]="!hasInventory">Retirar unidades</mat-option>
+      </mat-select>
+      <mat-hint *ngIf="!hasInventory">Se creará un registro de inventario.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="field">
+      <mat-label>Cantidad</mat-label>
+      <input matInput type="number" formControlName="quantity" min="1" step="1" />
+      <mat-error *ngIf="form.get('quantity')?.hasError('min')">Debe ser mayor que cero</mat-error>
+      <mat-error *ngIf="form.get('quantity')?.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="actions">
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" type="submit" form="adjustForm">Guardar</button>
+</mat-dialog-actions>
